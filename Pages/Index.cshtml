@@ -42,6 +42,9 @@
 
             <button class="btn btn-default" type="submit" onclick="return checkFileInput()"> abrir </button>
         </form>
+        @*
+            script para o usuário não enviar arquivos nulos
+        *@
         <script>
             function checkFileInput() {
                 let fileInput = document.getElementById("fileInput");
@@ -67,9 +70,13 @@
             <form>
                 <div>
                     <p>nodes</p>
+                    @*
+                        teóricamente, aqui era para ter nodos também, por isto o forms e o atualizar.
+                        Porém como eu não consegui fazer por enquanto estará aí como um "TODO"
+                    *@
                     <button type="submit">atualizar</button>
                 </div>
-                <textarea class="xml-text" name="xml2" rows="12" cols="80">@Model.text2</textarea>
+                <textarea class="xml-text" name="xml2" rows="12" cols="80" readonly>@Model.text2</textarea>
             </form>
        </div>
     </div>

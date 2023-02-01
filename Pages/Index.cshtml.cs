@@ -46,15 +46,9 @@ namespace XmlWebEditor.Pages
             text1 = xml;//Xml que as pessoas editam
             text2 = "";//Xml que estará disponível para a pessoa pegar. 
             
-            /*
-             * Mudanças para o futuro: 
-             * -texto2 irá capturar as informações do texto1 (ou seja: a pessoa irá editar
-             * e irá atualizar no texto 2 mesmo
-             * -função para atualizar texto 1 e aparecer as coisas para editar. 
-             */
 
             
-            this.text2 += xmlUpdate.UpdateXmlFile(Upload,environment,fileName,aux,ref message);
+            this.text2 += xmlUpdate.UpdateXmlFile(environment,fileName,aux,ref message);
             if (message != "")
             {
                 IsResponse = true;

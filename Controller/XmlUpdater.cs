@@ -226,7 +226,7 @@ namespace XmlWebEditor.Controller
             aux=File.ReadAllText(newFile);
             return aux;
         }// end NewXmlFile
-        public string UpdateXmlFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,string xmlText, ref string error)
+        public string UpdateXmlFile(IWebHostEnvironment environment, string fileName,string xmlText, ref string error)
         {
 
             string aux=xmlText;
@@ -237,7 +237,6 @@ namespace XmlWebEditor.Controller
              * para atualizar e então o document.load poder ser utilizado, por isto:
              * */
             Thread.Sleep(100);
-            //TRANSFORM A FILE INTO A FORM FILE
 
             try
             {
@@ -264,7 +263,6 @@ namespace XmlWebEditor.Controller
                     e.LinePosition + " o erro:  " + e.Message;
                 return aux;
             }
-            //END TRANSFORM FILE 
         }//end UpdateXmlFile
 
     }//end XmlUpdater
