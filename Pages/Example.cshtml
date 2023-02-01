@@ -1,0 +1,17 @@
+﻿@page
+@model XmlWebEditor.Pages.ExampleModel
+@{
+    ViewData["Title"] = "teste";
+    var result = ViewData["result"];
+}
+<div>
+    <label>Upload File</label>
+    <form asp-page-handler="xmlTextController2" method="post" enctype="multipart/form-data" >
+        <input type="file" class="form-control" asp-for="Upload" />
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+    </form>
+
+     <textarea class="xml-text" name="xml2" rows="10" cols="80" readonly>@result</textarea>
+</div>

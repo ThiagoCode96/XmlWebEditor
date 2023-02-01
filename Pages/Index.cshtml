@@ -1,0 +1,76 @@
+﻿@page
+@model IndexModel
+
+
+@{
+    ViewData["Title"] = "XmlEditor";
+    ////reading data
+    
+    ///end reading data
+}
+
+<div id="text-center">
+    <h1 class="display-4">Xml Editor</h1>
+</div>
+<div id="xml-center">
+    @if (Model.IsResponse)
+    {
+        if (Model.IsSuccess)
+        {
+            <div class="alert alert-success">
+                @Model.message
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger">
+                @Model.message
+            </div>
+        }
+    }
+    <div id="xml-button-top">
+        <form asp-page-handler="xmlTextStart" method="post" enctype="multipart/form-data">
+            <button class="btn btn-default"> novo </button>
+        </form>
+        
+            <a class="btn btn-default" href="@Url.Page("Index","xmlGetFile")"> salvar </a>
+        
+    </div>
+    <div id="xml-archives">
+        <form asp-page-handler="xmlSetFile" method="post" enctype="multipart/form-data">
+            <input type="file" class="form-control" id="fileInput" asp-for="Upload" />
+
+            <button class="btn btn-default" type="submit" onclick="return checkFileInput()"> abrir </button>
+        </form>
+        <script>
+            function checkFileInput() {
+                let fileInput = document.getElementById("fileInput");
+                if (!fileInput.value) {
+                    alert("Por favor adicione um arquivo Xml");
+                    return false;
+                }
+                return true;
+            }
+        </script>
+    </div>
+    <div id="xml-textarea">
+        <div>
+            <form asp-page-handler="xmlTextController" method="post">
+                <div>
+                    <p>text</p>
+                    <button type="submit">atualizar</button>
+                </div>
+                <textarea class="xml-text" typeof="text" name="xml" rows="12" cols="80">@Model.text1</textarea>
+            </form>
+        </div>
+       <div>
+            <form>
+                <div>
+                    <p>nodes</p>
+                    <button type="submit">atualizar</button>
+                </div>
+                <textarea class="xml-text" name="xml2" rows="12" cols="80">@Model.text2</textarea>
+            </form>
+       </div>
+    </div>
+</div>

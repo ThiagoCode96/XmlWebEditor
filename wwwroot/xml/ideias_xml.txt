@@ -1,0 +1,32 @@
+
+
+novo|abrir|salvar|salvar como|
+
+	nodos		+  -	|		texto
+
+
+
+O usuário entraria no sistema e escolhe entre criar um novo nodo ou abrir um novo nodo.
+
+Ao abrir um novo nodo, o usuário irá escolher dentro do sistema aonde estará o novo nodo
+
+ao criar ou instalar o novo nodo, o usuário poderá editá-lo pelos arquivos de:
+
+	entrada 1- texto: o usuário poderá adicionar, alterar e excluir os nodos utilizando a edição de texto via comando. Caso o programa encontre um arquivo sem a sua end tag ele representará aquele nodo em vermelho. a cada vez que há uma atualização terminada (ou seja: após o usuário parar de fazer a edição) o tipo nodo 
+
+	entrada 2-nodos: o usuário poderá averiguar os nodos dentro do projeto, podento também alterá-los e caso haja algum nodo sem a end tag deixará aquele nodo com a cor vermelha (que ao clicá-lo levará para a parte do texto dentro da entrada 1). O usuário também poderá adicionar mais nodos ou excluir nodos (porém ao deletar um nodo haverá um sinal de aviso). Ao adicionar algum nodo, o programa irá enviar uma mensagem para definir qual será a subclasse do nodo criado.
+
+Finalmente ao terminar toda a edição ele poderá clicar na aba de salvar que irá enviar o arquivo para a pasta que o usuário escolheu. Caso ele deseje criar um novo XML deverá clicar no botão "novo Xml", cujo também irá demonstrar uma mensagem de validação.
+
+funcionalidades:
+
+	novo_XmL: deleta tudo que há no XML atual e cria um novo documento em branco para Xml
+	abrir_Xml: função que irá abrir o XML da pasta desejada
+	salvar_Xml: função que irá salvar o XML na pasta desejada
+	verificar_erro_tag: função que irá verificar caso haja algum erro de falta de tag (para a entrada1 irá transformar a tag que talvez esteja faltando em vermelho e para a entrada 2 irá deixar ineditável a tag que esteja faltando)
+	editar_tag: função cujo serve apenas para a entrada2 que ao editar algum valor de alguma tag irá atualizar no entrada1
+	atualizar_tag: função cujo serve apenas para a entrada1 que ao editar alguma coisa estará atualizando as informações do entrada2
+	adicionar_tag: função cujo serve para adicionar uma subtag na entrada2. ao escolher o nome da subtag e a classe_pai da mesma faz se uma atualização das duas entradas com a tag adicional
+	deletar_tag: função cujo serve para deletar alguma subtag na entrada2. Antes de deletar o arquivo irá enviar uma mensagem de validação para que não ocorra erros. Ao deletar a tag também irá deletar as suas subtags, então caso haja alguma subtag o sistema terá que enviar novamente uma mensagem de validação avisando sobre a exclusão das mesmas.
+
+
