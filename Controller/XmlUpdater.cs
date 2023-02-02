@@ -17,141 +17,6 @@ namespace XmlWebEditor.Controller
 {
     public class XmlUpdater
     {
-        /*
-         * Isto aqui é para demonstrar a mim mesmo que o que eu fiz foi desnecessário. Quer dizer, eu fui a raíz do problema e programei-o para funcionar da maneira correta,
-         * Porém há outras funções e métodos para corrigir o problema. Logo: 
-         * -isto é para o eu do futuro quando eu rever meu código-
-         * PELO AMOR DE DEUS
-         * APRENDE A FAZER AS PERGUNTAS CERTAS E VERIFICA NA NET SE HÁ ALGUMA FUNÇÃO QUE SERVE
-         * NÃO "IVENTA A RODA"!!!!!!!!!
-         * 
-        private string TextGrabber(ref string material, ref string tagType)//captura tags e textos
-        {
-            string tag = "";
-            int n = 0;
-            if (material[n] != '<')
-            {
-                while (material.Length > n && material[n] != '<')
-                {
-                    
-                    tag += material[n].ToString();
-                    n++;
-                }
-                tagType = "DT";
-            }
-            else
-            {
-                do
-                {
-                    
-                    tag += material[n].ToString();
-                    n++; 
-
-                } while (material.Length > n && material[n - 1] != '>');
-               
-                
-
-            }
-            material = material.Substring(n);
-
-            if (tag[0] == '<')
-                if (tag[1] == '/')
-                    tagType = "CT";
-                else if (tag.Contains("/>"))
-                    tagType = "FT";
-                else
-                    tagType = "OT";
-
-            return tag;
-        }//end textgrabber
-        private string TextCleaner(ref string material)// limpa espaços e linhas
-        {
-            string aux="";
-            while (material != "")
-            {
-                if (material[0] == '\t' || material[0] == '\n' || material[0] == '\r' || (material[0] == ' ' && !Char.IsLetter(material[1])))
-                { //limpando os tabs e enters
-                    material = material.Substring(1);
-                    continue;
-                }
-                aux += material[0].ToString();
-                material = material.Substring(1);
-            }
-            return aux;
-        }//end textcleaner
-        private string TagIdentity(string tag)
-        {
-            string aux =tag, identity="";
-            
-            while (aux != "")
-            {
-                if (aux[0] == '<' || aux[0] == '/' || aux[0] == '>')
-                { //limpando os tabs e enters
-                    aux = aux.Substring(1);
-                    continue;
-                }
-                identity += aux[0].ToString();
-                aux = aux.Substring(1);
-            }
-            return identity;
-
-        }//end tag identity
-        private string TextTab(int quantity)//coloca as tabs no texto
-        {
-            string tab = "";
-            tab += "\n";
-            for (int n = 0; n < quantity; n++)
-            {
-                tab += "\t";
-            }
-            return tab;
-        }//end texttab
-        public string TextIdentator(ref string textToIdent)//faz a verificação da identação
-        {
-            string tagGraberAux1 = "", tagGraberAux2 = "";
-            string anterior="", agora="";
-            int count=0;
-            textToIdent = TextCleaner(ref textToIdent);
-            tagGraberAux1=TextGrabber(ref textToIdent,ref anterior);
-            string final = tagGraberAux1;
-            do
-            {
-                if (textToIdent.Length > 0)
-                {
-                    tagGraberAux2 = TextGrabber(ref textToIdent,ref agora);
-                    if(anterior=="OT"&& agora == "OT" || anterior == "OT" && agora == "FT")
-                    {
-                        count++;
-                        final += TextTab(count);
-                        final += tagGraberAux2;
-                    }
-                    else if (anterior == "CT" && agora == "CT"|| anterior=="FT"&& agora=="CT")
-                    {
-                        count--;
-                        final += TextTab(count);
-                        final += tagGraberAux2;
-
-                    }
-                    else if (anterior == "DT" && agora == "CT" || anterior == "OT" && agora=="CT" || anterior == "OT" && agora == "DT")
-                        final += tagGraberAux2;
-                    else
-                    {
-                        final += TextTab(count);
-                        final += tagGraberAux2;
-                    }
-
-                    anterior = agora;
-                    
-                }
-                else
-                {
-                    //throw new Exception("identation error");
-                    return final;
-                }
-            } while (TagIdentity(tagGraberAux1) != TagIdentity(tagGraberAux2));
-            return final;
-        }//end tagInterator
-        */
         public string VefiryXml(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
         {
             
@@ -258,27 +123,22 @@ namespace XmlWebEditor.Controller
         }// end NewXmlFile
         public string UpdateXmlFile(IWebHostEnvironment environment, string fileName,string xmlText, ref string error)
         {
-
-            string aux=xmlText;
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName);
-            var fileAux = Path.Combine(environment.ContentRootPath, "xml","fileAux.xml");
-            File.WriteAllTextAsync(fileAux,xmlText);
-            /*Resumidamente: File.WriteallTextAsync necessita de tempo
-             * para atualizar e então o document.load poder ser utilizado, por isto:
-             * */
-            Thread.Sleep(100);
-
+            string xml = xmlText;
             try
             {
-
-                aux = TextIdentator(ref aux);
-
-
+               
                 XmlDocument document = new XmlDocument();
-                document.Load(fileAux);//Verifica se o Xml está funcional. Se estiver envia para o original
-                document.RemoveAll();//limpa o XmlDocument
+                document.LoadXml(xml);
+                xml = XElement.Parse(xml).ToString();
+                var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+                var fileAux = Path.Combine(environment.ContentRootPath, "xml", "fileAux.xml");
+                File.WriteAllTextAsync(fileAux, xmlText);
+                /*Resumidamente: File.WriteallTextAsync necessita de tempo
+                 * para atualizar e então o document.load poder ser utilizado, por isto:
+                 * */
+                Thread.Sleep(100);
                 File.Copy(fileAux, file, true);
-                return aux;
+                return xml;
 
             }
             catch (XmlException e)
@@ -287,11 +147,11 @@ namespace XmlWebEditor.Controller
                 if (e.Message == "Data at the root level is invalid. Line 1, position 1.")
                 {
                     error = "documento inválido. por favor, digite um documento XML válido";
-                    return aux;
+                    return xml;
                 }
                 error = "erro na linha " + e.LineNumber + " na posição: " +
                     e.LinePosition + " o erro:  " + e.Message;
-                return aux;
+                return xml;
             }
         }//end UpdateXmlFile
 

@@ -84,7 +84,7 @@ namespace XmlWebEditor.Pages
         {
             try
             {
-                var file = Path.Combine(environment.ContentRootPath, "xml", fileName);
+                var file = Path.Combine(environment.ContentRootPath, "xml", fileName+".xml");
                 byte[] bytes = System.IO.File.ReadAllBytes(file);
                 string contentType;
                 new FileExtensionContentTypeProvider().TryGetContentType(file, out contentType);

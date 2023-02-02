@@ -41,7 +41,6 @@ namespace XmlWebEditor.Pages
                     reader.Dispose();
                 }
                 XmlUpdater updater = new XmlUpdater();
-                xml = updater.TextIdentator(ref xml);
                 texto2 = xml;
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
