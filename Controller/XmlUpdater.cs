@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.Net.Mime;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Text.Json;
+using System.Web.Helpers;
 using System.Xml;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
@@ -13,6 +17,14 @@ namespace XmlWebEditor.Controller
 {
     public class XmlUpdater
     {
+        /*
+         * Isto aqui é para demonstrar a mim mesmo que o que eu fiz foi desnecessário. Quer dizer, eu fui a raíz do problema e programei-o para funcionar da maneira correta,
+         * Porém há outras funções e métodos para corrigir o problema. Logo: 
+         * -isto é para o eu do futuro quando eu rever meu código-
+         * PELO AMOR DE DEUS
+         * APRENDE A FAZER AS PERGUNTAS CERTAS E VERIFICA NA NET SE HÁ ALGUMA FUNÇÃO QUE SERVE
+         * NÃO "IVENTA A RODA"!!!!!!!!!
+         * 
         private string TextGrabber(ref string material, ref string tagType)//captura tags e textos
         {
             string tag = "";
@@ -139,10 +151,11 @@ namespace XmlWebEditor.Controller
             } while (TagIdentity(tagGraberAux1) != TagIdentity(tagGraberAux2));
             return final;
         }//end tagInterator
+        */
         public string VefiryXml(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
         {
             
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName);
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName+".xml");
             string xml = "";
             try
             {
@@ -154,18 +167,15 @@ namespace XmlWebEditor.Controller
                     }
                     reader.Dispose();
                 }
-                xml = TextIdentator(ref xml);
+                XmlDocument document = new XmlDocument();
+                document.LoadXml(xml);
+                xml = XElement.Parse(xml).ToString();
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
                     byte[] information = new UTF8Encoding(true).GetBytes(xml);
                     fileStream.Write(information, 0, information.Length);
                     fileStream.Dispose();
                 }
-                
-            
-                XmlDocument document = new XmlDocument();
-                document.Load(file);
-                document.RemoveAll();//limpa o XmlDocument
                 return xml;
 
             }
@@ -182,38 +192,58 @@ namespace XmlWebEditor.Controller
             }
             
         }//end XmlVerification
-        public string SetXmlFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
+        public string VerifyJson(IFormFile Upload, IWebHostEnvironment environment, string fileName, ref string error)
         {
 
-
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName);
-            string aux = "";
-
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName+".json");
+            string json = "";
             try
             {
-
                 using (var reader = new StreamReader(Upload.OpenReadStream()))
                 {
                     while (reader.Peek() >= 0)
                     {
-                        aux += reader.ReadLine();
+                        json += reader.ReadLine();
                     }
                     reader.Dispose();
                 }
-                XmlUpdater updater = new XmlUpdater();
-                aux = updater.TextIdentator(ref aux);
+                dynamic jsonAux = JsonConvert.DeserializeObject(json);
 
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
-                    byte[] information = new UTF8Encoding(true).GetBytes(aux);
+                    byte[] information = new UTF8Encoding(true).GetBytes(JsonConvert.SerializeObject(jsonAux, Newtonsoft.Json.Formatting.Indented));
                     fileStream.Write(information, 0, information.Length);
                     fileStream.Dispose();
                 }
-                return updater.VefiryXml(Upload, environment,fileName,ref error);
+                return JsonConvert.SerializeObject(jsonAux, Newtonsoft.Json.Formatting.Indented);
+
+            }
+            catch (JsonReaderException e)
+            {
+                if (e.Message == "Data at the root level is invalid. Line 1, position 1.")
+                {
+                    error = "documento inválido. por favor, digite um documento XML válido";
+                    return json;
+                }
+                error = e.Message;
+                return json;
+            }
+        }//end VerifyJson
+            public string SetXmlFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
+        {
+            try
+            {
+                string contentType = Upload.ContentType;
+                if (contentType == "text/xml" || contentType == "application/xml")
+                    return VefiryXml(Upload, environment, fileName, ref error);
+                else if (contentType == "text/json" || contentType == "application/json")
+                    return VerifyJson(Upload, environment, fileName, ref error);
+                else
+                    throw new System.NullReferenceException();
             }
             catch (System.NullReferenceException)
             {
-                error="Por favor, insira um documento Xml";
+                error="Por favor, insira um documento Xml ou Json";
                 return "";
             }
         }//end SetXmlFile

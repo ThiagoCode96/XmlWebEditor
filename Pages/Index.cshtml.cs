@@ -27,7 +27,7 @@ namespace XmlWebEditor.Pages
         public bool IsSuccess { get; set; }
         public bool IsResponse { get; set; }
         public string message = "";
-        private string fileName = "xmlArchive.xml";
+        private string fileName = "auxArchive";
         XmlUpdater xmlUpdate = new XmlUpdater();
         public void OnGet()
         {
