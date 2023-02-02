@@ -87,14 +87,14 @@ namespace XmlWebEditor.Controller
             {
                 if (e.Message == "Data at the root level is invalid. Line 1, position 1.")
                 {
-                    error = "documento inválido. por favor, digite um documento XML válido";
+                    error = "documento inválido. por favor, digite um documento Json válido";
                     return json;
                 }
                 error = e.Message;
                 return json;
             }
         }//end VerifyJson
-            public string SetXmlFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
+        public string SetXmlFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
         {
             try
             {
@@ -121,12 +121,40 @@ namespace XmlWebEditor.Controller
             aux=File.ReadAllText(newFile);
             return aux;
         }// end NewXmlFile
-        public string UpdateXmlFile(IWebHostEnvironment environment, string fileName,string xmlText, ref string error)
+        public string NewJsonFile(IWebHostEnvironment environment, string fileName)
+        {
+            string aux = "";
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName);
+            var newFile = Path.Combine(environment.ContentRootPath, "xml", "NewFile.json");
+            File.Copy(newFile, file, true);
+            aux = File.ReadAllText(newFile);
+            return aux;
+        }// end NewXmlFile
+        public string UpdateFile(IWebHostEnvironment environment, string fileName,string xmlText, ref string error)
+        {
+            try
+            {
+                
+                if (xmlText.StartsWith("<"))
+                    return UpdateXmlFile(environment, fileName,xmlText, ref error);
+                else if (xmlText.StartsWith("{"))
+                    return UpdateJsonFile(environment, fileName,xmlText, ref error);
+                else
+                    throw new System.NullReferenceException();
+            }
+            catch (System.NullReferenceException)
+            {
+                error = "Por favor, digite um  Xml ou Json";
+                return "";
+            }
+
+        }//end UpdateFile
+        public string UpdateXmlFile(IWebHostEnvironment environment, string fileName, string xmlText, ref string error)
         {
             string xml = xmlText;
             try
             {
-               
+
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(xml);
                 xml = XElement.Parse(xml).ToString();
@@ -136,7 +164,7 @@ namespace XmlWebEditor.Controller
                 /*Resumidamente: File.WriteallTextAsync necessita de tempo
                  * para atualizar e então o document.load poder ser utilizado, por isto:
                  * */
-                Thread.Sleep(100);
+                //Thread.Sleep(100);
                 File.Copy(fileAux, file, true);
                 return xml;
 
@@ -154,6 +182,40 @@ namespace XmlWebEditor.Controller
                 return xml;
             }
         }//end UpdateXmlFile
+
+        public string UpdateJsonFile(IWebHostEnvironment environment, string fileName, string xmlText, ref string error)
+        {
+            string json = xmlText;
+            dynamic jsonAux;
+            try
+            {
+
+                jsonAux = JsonConvert.DeserializeObject(json);
+                json = JsonConvert.SerializeObject(jsonAux, Newtonsoft.Json.Formatting.Indented);
+                var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+                var fileAux = Path.Combine(environment.ContentRootPath, "xml", "fileAux.json");
+                File.WriteAllTextAsync(fileAux, xmlText);
+                /*Resumidamente: File.WriteallTextAsync necessita de tempo
+                 * para atualizar e então o document.load poder ser utilizado, por isto:
+                 * */
+                //Thread.Sleep(100);
+                File.Copy(fileAux, file, true);
+                return json;
+
+            }
+            catch (XmlException e)
+            {
+                //senão não envia a cópia do File.copy
+                if (e.Message == "Data at the root level is invalid. Line 1, position 1.")
+                {
+                    error = "documento inválido. por favor, digite um documento XML válido";
+                    return json;
+                }
+                error = "erro na linha " + e.LineNumber + " na posição: " +
+                    e.LinePosition + " o erro:  " + e.Message;
+                return json;
+            }
+        }//end UpdateJsonFile
 
     }//end XmlUpdater
 

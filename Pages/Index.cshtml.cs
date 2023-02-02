@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using System.Net.Mime;
 using Microsoft.AspNetCore.StaticFiles;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Xml;
 
 namespace XmlWebEditor.Pages
 {
@@ -37,10 +39,14 @@ namespace XmlWebEditor.Pages
         {
             text1 = xmlUpdate.NewXmlFile( environment, fileName);
         }
+        public void OnPostJsonTextStart()
+        {
+            text1 = xmlUpdate.NewJsonFile(environment, fileName);
+        }
         /*
          * fução que controla a entrada e saída dos dois textos
          */
-        public void OnPostXmlTextController( string xml)
+        public void OnPostTextController( string xml)
         {
             string aux = xml;
             text1 = xml;//Xml que as pessoas editam
@@ -48,7 +54,7 @@ namespace XmlWebEditor.Pages
             
 
             
-            this.text2 += xmlUpdate.UpdateXmlFile(environment,fileName,aux,ref message);
+            this.text2 += xmlUpdate.UpdateFile(environment,fileName,aux,ref message);
             if (message != "")
             {
                 IsResponse = true;
@@ -77,14 +83,22 @@ namespace XmlWebEditor.Pages
             {
                 IsResponse = true;
                 IsSuccess =true;
-                message ="Xml enviada com sucesso";
+                message ="arquivo enviado com sucesso";
             }
         }
-        public ActionResult OnGetXmlGetFile()
+        public ActionResult OnGetFile(string text)
         {
-            try
-            {
-                var file = Path.Combine(environment.ContentRootPath, "xml", fileName+".xml");
+            try { 
+
+
+                string file;
+                if (text1.StartsWith("<"))
+                    file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+                else if (text1.StartsWith("{"))
+
+                    file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+                else
+                    throw new System.NullReferenceException();
                 byte[] bytes = System.IO.File.ReadAllBytes(file);
                 string contentType;
                 new FileExtensionContentTypeProvider().TryGetContentType(file, out contentType);
@@ -93,8 +107,17 @@ namespace XmlWebEditor.Pages
             }
             catch (System.IO.FileNotFoundException)
             {
-                text1 = "Não há nenhum arquivo no sistema. Se desejar, por favor crie um novo arquivo";
-                return Redirect(Request.Headers["Referer"].ToString());
+                message= "Não há nenhum arquivo no sistema. Se desejar, por favor crie um novo arquivo";
+                IsResponse = true;
+                IsSuccess = false;
+                return Redirect(Request.Headers["Referer"].ToString());//retun "null"
+            }
+            catch(System.NullReferenceException e)
+            {
+                message = e.Message;
+                IsResponse = true;
+                IsSuccess = false;
+                return Redirect(Request.Headers["Referer"].ToString());//retun "null"
             }
         }
     }

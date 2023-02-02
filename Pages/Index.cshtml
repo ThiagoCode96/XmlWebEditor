@@ -3,9 +3,8 @@
 
 
 @{
-    ViewData["Title"] = "XmlEditor";
+    ViewData["Title"] = "Xml/JsonEditor";
     ////reading data
-    
     ///end reading data
 }
 
@@ -30,10 +29,13 @@
     }
     <div id="xml-button-top">
         <form asp-page-handler="xmlTextStart" method="post" enctype="multipart/form-data">
-            <button class="btn btn-default"> novo </button>
+            <button class="btn btn-default"> novo XML </button>
         </form>
-        
-            <a class="btn btn-default" href="@Url.Page("Index","xmlGetFile")"> salvar </a>
+        <form asp-page-handler="jsonTextStart" method="post" enctype="multipart/form-data">
+            <button class="btn btn-default"> novo XML </button>
+        </form>
+
+        <a class="btn btn-default" asp-page-handler="File" asp-route-id="text"> salvar </a>
         
     </div>
     <div id="xml-archives">
@@ -49,7 +51,7 @@
             function checkFileInput() {
                 let fileInput = document.getElementById("fileInput");
                 if (!fileInput.value) {
-                    alert("Por favor adicione um arquivo Xml");
+                    alert("Por favor adicione um arquivo Xml ou Json");
                     return false;
                 }
                 return true;
@@ -63,7 +65,7 @@
                     <p>text</p>
                     <button type="submit">atualizar</button>
                 </div>
-                <textarea class="xml-text" typeof="text" name="xml" rows="12" cols="80">@Model.text1</textarea>
+                <textarea class="xml-text" typeof="text" name="text" rows="12" cols="80">@Model.text1</textarea>
             </form>
         </div>
        <div>
