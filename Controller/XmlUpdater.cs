@@ -145,7 +145,7 @@ namespace XmlWebEditor.Controller
             catch (System.NullReferenceException)
             {
                 error = "Por favor, digite um  Xml ou Json";
-                return "";
+                return xmlText;
             }
 
         }//end UpdateFile

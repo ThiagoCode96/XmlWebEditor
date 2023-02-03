@@ -46,10 +46,10 @@ namespace XmlWebEditor.Pages
         /*
          * fução que controla a entrada e saída dos dois textos
          */
-        public void OnPostTextController( string xml)
+        public void OnPostTextController( string text)
         {
-            string aux = xml;
-            text1 = xml;//Xml que as pessoas editam
+            string aux = text;
+            text1 = text;//Xml que as pessoas editam
             text2 = "";//Xml que estará disponível para a pessoa pegar. 
             
 

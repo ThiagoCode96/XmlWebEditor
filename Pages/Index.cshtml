@@ -32,10 +32,10 @@
             <button class="btn btn-default"> novo XML </button>
         </form>
         <form asp-page-handler="jsonTextStart" method="post" enctype="multipart/form-data">
-            <button class="btn btn-default"> novo XML </button>
+            <button class="btn btn-default"> novo Json </button>
         </form>
 
-        <a class="btn btn-default" asp-page-handler="File" asp-route-id="text"> salvar </a>
+        @*<a class="btn btn-default" asp-page-handler="File"> salvar </a>*@
         
     </div>
     <div id="xml-archives">
@@ -60,7 +60,7 @@
     </div>
     <div id="xml-textarea">
         <div>
-            <form asp-page-handler="xmlTextController" method="post">
+            <form asp-page-handler="textController" method="post">
                 <div>
                     <p>text</p>
                     <button type="submit">atualizar</button>
