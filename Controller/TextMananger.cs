@@ -15,7 +15,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace XmlWebEditor.Controller
 {
-    public class XmlUpdater
+    public class TextMananger
     {
         public string VefiryXml(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
         {
@@ -134,11 +134,16 @@ namespace XmlWebEditor.Controller
         {
             try
             {
-                
+
                 if (xmlText.StartsWith("<"))
-                    return UpdateXmlFile(environment, fileName,xmlText, ref error);
+                {
+                   
+                    return UpdateXmlFile(environment, fileName, xmlText, ref error);
+                }
                 else if (xmlText.StartsWith("{"))
-                    return UpdateJsonFile(environment, fileName,xmlText, ref error);
+                {
+                    return UpdateJsonFile(environment, fileName, xmlText, ref error);
+                }
                 else
                     throw new System.NullReferenceException();
             }
@@ -217,6 +222,6 @@ namespace XmlWebEditor.Controller
             }
         }//end UpdateJsonFile
 
-    }//end XmlUpdater
+    }//end TextMananger
 
 }//end namespace

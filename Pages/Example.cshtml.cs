@@ -20,51 +20,24 @@ namespace XmlWebEditor.Pages
         [BindProperty]
         public IFormFile Upload { get; set; }
         public string texto2 { get; set; }
+
+        private string fileName = "auxText";
+
         public ExampleModel(IWebHostEnvironment _environment)
         {
             environment = _environment;
         }
-        public void OnPostXmlTextController2()
+        public void xml_tree()
         {
-
-            string fileName = "xmlText"; //Upload.FileName;
-            var file=Path.Combine(environment.ContentRootPath,"xml", fileName);
-            string xml="";
-            try
-            {
-                using (var reader = new StreamReader(Upload.OpenReadStream()))
-                {
-                    while (reader.Peek() >= 0)
-                    {
-                        xml += reader.ReadLine();
-                    }
-                    reader.Dispose();
-                }
-                XmlUpdater updater = new XmlUpdater();
-                texto2 = xml;
-                using (var fileStream = new FileStream(file, FileMode.Create))
-                {
-                    byte[] information = new UTF8Encoding(true).GetBytes(xml);
-                    fileStream.Write(information, 0, information.Length);
-                }
-                ViewData["result"] = "test?";
-            }
-            catch(System.NullReferenceException )
-            {
-                ViewData["result"]="Por favor, insira um documento Xml";
-            }
-            
+            string file = Path.Combine(environment.ContentRootPath, "xml", fileName+".xml");
+            XmlDocument document= new XmlDocument();
+            document.LoadXml(file);
 
 
-
-
-
-                
-       
-            
-            
-            
         }
+
+        //private string file = Path.Combine(environment.ContentRootPath, "xml", fileName);
+       
 
     }
 }

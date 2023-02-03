@@ -4,8 +4,12 @@
 
 @{
     ViewData["Title"] = "Xml/JsonEditor";
-    ////reading data
-    ///end reading data
+    bool isXml = false;
+    if (Model.text1.StartsWith("<") )
+        isXml= true;
+    else
+        isXml = false;
+
 }
 
 <div id="text-center">
@@ -34,15 +38,23 @@
         <form asp-page-handler="jsonTextStart" method="post" enctype="multipart/form-data">
             <button class="btn btn-default"> novo Json </button>
         </form>
+        @if (isXml)
+        {
 
-        @*<a class="btn btn-default" asp-page-handler="File"> salvar </a>*@
-        
+            <a class="btn btn-default" asp-page-handler="xmlFile">salvar </a>
+        }
+        else
+        {
+           <a class="btn btn-default" asp-page-handler="jsonFile"> salvar </a>
+            
+        }
+
     </div>
     <div id="xml-archives">
         <form asp-page-handler="xmlSetFile" method="post" enctype="multipart/form-data">
             <input type="file" class="form-control" id="fileInput" asp-for="Upload" />
 
-            <button class="btn btn-default" type="submit" onclick="return checkFileInput()"> abrir </button>
+            <button class="btn btn-default" type="submit"  onclick="return checkFileInput()"> abrir </button>
         </form>
         @*
             script para o usuário não enviar arquivos nulos
@@ -62,10 +74,11 @@
         <div>
             <form asp-page-handler="textController" method="post">
                 <div>
+                    
                     <p>text</p>
-                    <button type="submit">atualizar</button>
+                    <button  type="submit">atualizar</button>
                 </div>
-                <textarea class="xml-text" typeof="text" name="text" rows="12" cols="80">@Model.text1</textarea>
+                <textarea class="xml-text"  typeof="text" name="text" rows="12" cols="80">@Model.text1</textarea>
             </form>
         </div>
        <div>
