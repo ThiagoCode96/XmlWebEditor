@@ -9,6 +9,10 @@ using Microsoft.AspNetCore.StaticFiles;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml;
 using Microsoft.AspNetCore.Mvc.DataAnnotations;
+using System.Collections.Generic;
+using System.Xml.Linq;
+using Microsoft.AspNetCore.Hosting.Server;
+using System.Reflection;
 
 namespace XmlWebEditor.Pages
 {
@@ -116,7 +120,7 @@ namespace XmlWebEditor.Pages
                 return Redirect(Request.Headers["Referer"].ToString());//retun "null"
             }
 
-        }
+        }// end GetJsonFile
         public ActionResult OnGetXmlFile()
         {
             string file;
@@ -143,6 +147,44 @@ namespace XmlWebEditor.Pages
                 IsSuccess = false;
                 return Redirect(Request.Headers["Referer"].ToString());//retun "null"
             }
+        }// end GetXmlFile
+    }//end class
+        /*
+        public List<Node> getNode()
+        {
+
+            string file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+            XmlDocument document = new XmlDocument();
+            document.Load(file);
+            List <Node> tree = ConvertToTree(document.DocumentElement);
+            return tree;
         }
-    }
-}
+        private List<Node> ConvertToTree(XmlNode  xmlNode)
+        {
+            
+            List<Node> nodes = new List<Node>();
+            foreach (XmlNode childNode in xmlNode.ChildNodes)
+            {
+                //if (childNode.Attributes != null && childNode.Attributes["text"] != null)
+                {
+                    Node node = new Node
+                    {
+                        text = childNode.Attributes["text"].Value,
+                        children = ConvertToTree(childNode)
+                    };
+                    nodes.Add(node);
+                }
+            }
+            return nodes;
+        }// end ConvertToTree
+
+
+
+    }//end class
+    public class Node
+    {
+        public string text { get; set; }
+        public List<Node> children { get; set; }
+    }*/
+
+}//end namespace

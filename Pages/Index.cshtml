@@ -9,6 +9,10 @@
         isXml= true;
     else
         isXml = false;
+        @*
+    List<Node> tree = new List<Node>();
+    tree=Model.getNode();
+    *@
 
 }
 
@@ -89,10 +93,36 @@
                         teóricamente, aqui era para ter nodos também, por isto o forms e o atualizar.
                         Porém como eu não consegui fazer por enquanto estará aí como um "TODO"
                     *@
+                    
                     <button type="submit">atualizar</button>
                 </div>
                 <textarea class="xml-text" name="xml2" rows="12" cols="80" readonly>@Model.text2</textarea>
             </form>
        </div>
+       @*
+       *DEMONSTRAÇÃO DE ERRO
+       *DURANTE O TESTE DE TENTATIVA DE
+       *CRIAR UM NODE
+        <div id="tree">
+            @DisplayTree(tree);
+        </div>
+
+        @functions {
+            public object DisplayTree(List<Node> nodes)
+            {
+                foreach (Node node in nodes)
+                {
+                    <div class="node">@node.text</div>
+                    if (node.children.Count > 0)
+                    {
+                        <div class="child-container">
+                            @DisplayTree(node.children)
+                        </div>
+                    }
+                }
+                return null;
+            }
+            *@
+        }
     </div>
 </div>
