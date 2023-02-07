@@ -147,44 +147,17 @@ namespace XmlWebEditor.Pages
                 IsSuccess = false;
                 return Redirect(Request.Headers["Referer"].ToString());//retun "null"
             }
-        }// end GetXmlFile
-    }//end class
-        /*
-        public List<Node> getNode()
-        {
-
-            string file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
-            XmlDocument document = new XmlDocument();
-            document.Load(file);
-            List <Node> tree = ConvertToTree(document.DocumentElement);
-            return tree;
-        }
-        private List<Node> ConvertToTree(XmlNode  xmlNode)
-        {
-            
-            List<Node> nodes = new List<Node>();
-            foreach (XmlNode childNode in xmlNode.ChildNodes)
-            {
-                //if (childNode.Attributes != null && childNode.Attributes["text"] != null)
-                {
-                    Node node = new Node
-                    {
-                        text = childNode.Attributes["text"].Value,
-                        children = ConvertToTree(childNode)
-                    };
-                    nodes.Add(node);
-                }
-            }
-            return nodes;
-        }// end ConvertToTree
+        }//fim GetJsonFile
 
 
+        
+    }//Fim Classe IndexModel
+    /*
+         ************************************************
+         ************************************************
+         ******Início dos códigos dos nodos do site******
+         ************************************************
+         ************************************************
+    */
 
-    }//end class
-    public class Node
-    {
-        public string text { get; set; }
-        public List<Node> children { get; set; }
-    }*/
-
-}//end namespace
+}

@@ -6,11 +6,19 @@
 }
 <div>
     <p>Aviso: aqui foi para ter um local de testes. Talvez possa dar erros e bugs ao utilizar o mesmo</p>
-    <p> quase 2 horas estudando sobre xmltree e quase nada. Estarei estudando um pouco mais mais tarde (03/02)</p>
-    <div class="node">teste para verificar a criação de nodos</div>
-    <div class="child-container">
-       se isto aparecer em nodos significa que poderei fazer outra lógica de programação amanhã
-    </div>
+    
+    <script>
+    $('#tree').jstree({
+      'core' : {
+        'data' : {
+          'url' : 'ajax_nodes.html',
+          'data' : function (node) {
+            return { 'id' : node.id };
+          }
+        }
+      }
+    });
+    </script>
     
                   
 

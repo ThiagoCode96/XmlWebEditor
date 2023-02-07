@@ -1,5 +1,113 @@
-{
-  "root": {
-    "branche": "undefied"
+[
+  {
+    "@type": "ItemList",
+    "@context": "http://schema.org",
+    "numberOfItems": 12,
+    "itemListElement": [
+      [
+        {
+          "@type": "ListItem",
+          "name": "Garimpeiros relatam falta de comida e desespero: 'vai morrer muita gente'",
+          "position": 1,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/02/07/garimpeiros-relatam-falta-de-comida-e-desespero-vai-morrer-muita-gente.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Ainda longe de metas, cobertura vacinal cresce em 2022 após 3 anos de queda",
+          "position": 2,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/02/05/ainda-longe-de-metas-cobertura-vacinal-cresce-em-2022-apos-4-anos-de-queda.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Assassinato de três guajajaras no Maranhão causa terror em povo de ministra",
+          "position": 3,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/02/04/mortes-em-serie-de-guajajaras-causa-terror-em-povo-de-ministra-no-maranhao.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Maior ato de intolerância religiosa do Brasil destruiu 150 xangôs em 2/2",
+          "position": 4,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/02/02/quebra-de-xango-pais-vivia-maior-ato-de-intolerancia-religiosa-ha-111-anos.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Governo suspende e manda reavaliar autorizações de acesso à Terra Yanomami",
+          "position": 5,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/02/01/portaria-do-governo-suspende-novas-autorizacoes-de-acesso-a-terra-yanomami.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Governo Lula dá 60 dias para que todas as armas sejam cadastradas na PF",
+          "position": 6,
+          "url": "https://noticias.uol.com.br/politica/ultimas-noticias/2023/02/01/cadastro-de-armas-sinarm-governo-lula.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Yanomami relata 5 óbitos em aldeia: 'Socorro foi tarde, meu filho morreu'",
+          "position": 7,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/02/01/yanomami-relata-5-obitos-em-aldeia-socorro-foi-tarde-meu-filho-morreu.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Queimadas em florestas quase dobram e atingem pico da era Bolsonaro em 2022",
+          "position": 8,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/01/31/queimadas-em-florestas-quase-dobram-e-atingem-pico-da-era-bolsonaro-em-2022.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Esposas de deputados e empresário ficarão com vagas de ministros no Senado",
+          "position": 9,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/01/31/esposas-de-deputados-e-empresario-herdam-vagas-no-senado-de-ministros-do-ne.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Governo foi alertado sobre crimes do garimpo, mas parou fiscalização",
+          "position": 10,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/01/29/governo-foi-alertado-sobre-crimes-do-garimpo-e-parou-fiscalizacao-em-2022.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Programa Cisternas tem pior resultado em 2022 e gera espera por água no NE",
+          "position": 11,
+          "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/01/29/programa-cisternas-tem-pior-resultado-em-2022-e-gera-fila-de-espera-none.htm"
+        }
+      ],
+      [
+        {
+          "@type": "ListItem",
+          "name": "Mais rico, garimpo na terra Yanomami amplia uso do transporte aéreo",
+          "position": 12,
+          "url": "https://noticias.uol.com.br/politica/ultimas-noticias/2023/01/28/garimpo-se-moderniza-terra-indigena-yanomami.htm"
+        }
+      ]
+    ],
+    "url": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/02/07/garimpeiros-relatam-falta-de-comida-e-desespero-vai-morrer-muita-gente.htm",
+    "mainEntityOfPage": "https://noticias.uol.com.br/colunas/carlos-madeiro/2023/02/07/garimpeiros-relatam-falta-de-comida-e-desespero-vai-morrer-muita-gente.htm",
+    "image": {
+      "url": "https://conteudo.imguol.com.br/c/interacao/facebook/uol-noticias-wide.png",
+      "width": 2960,
+      "height": 1163,
+      "@type": "ImageObject"
+    }
   }
-}
+]

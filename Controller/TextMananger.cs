@@ -140,7 +140,7 @@ namespace XmlWebEditor.Controller
                    
                     return UpdateXmlFile(environment, fileName, xmlText, ref error);
                 }
-                else if (xmlText.StartsWith("{"))
+                else if (xmlText.StartsWith("{") || xmlText.StartsWith("["))
                 {
                     return UpdateJsonFile(environment, fileName, xmlText, ref error);
                 }
@@ -208,7 +208,7 @@ namespace XmlWebEditor.Controller
                 return json;
 
             }
-            catch (XmlException e)
+            catch (Newtonsoft.Json.JsonReaderException e)
             {
                 //senão não envia a cópia do File.copy
                 if (e.Message == "Data at the root level is invalid. Line 1, position 1.")
