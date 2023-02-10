@@ -61,7 +61,7 @@ namespace XmlWebEditor.Pages
 
 
 
-            this.text2 += xmlUpdate.UpdateFile(environment, fileName, aux, ref message);
+            text2 += xmlUpdate.UpdateFile(environment, fileName, aux, ref message);
             if (message != "")
             {
                 IsResponse = true;

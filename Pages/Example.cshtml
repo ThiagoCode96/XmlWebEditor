@@ -3,23 +3,116 @@
 @{
     ViewData["Title"] = "teste";
     var result = ViewData["result"];
+    var file = Model.getFile();
 }
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+
+<!-- Syncfusion ASP.NET Core controls styles -->
+<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.4.48/fluent.css" />
+
+
 <div>
     <p>Aviso: aqui foi para ter um local de testes. Talvez possa dar erros e bugs ao utilizar o mesmo</p>
-    
-    <script>
-    $('#tree').jstree({
-      'core' : {
-        'data' : {
-          'url' : 'ajax_nodes.html',
-          'data' : function (node) {
-            return { 'id' : node.id };
-          }
-        }
-      }
-    });
-    </script>
-    
-                  
-
 </div>
+<div id="html1">
+    <ul>
+        <li>Root node 1</li>
+        <ul>
+            <li>teste</li>
+            <li>teste2</li>
+        </ul>
+        <li>Root node 2</li>
+    </ul>
+</div>
+<div id="teste"></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* FUNÇÃO JSTREE
+    *
+    *
+    *
+    VERIFICAR DEPOIS ABAIXO.
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+<script type="text/javascript" src="~/wwwroot/js/jsTreeHelper.js" id="treehelper"></script>
+
+<script>
+    let data_2 = @Html.Raw(Json.Serialize(Model.texto2));
+    
+    $.ajax({
+        url: encodeURIComponent(@Html.Raw(file)),
+        dataType: 'json',
+        success: function (data) {
+            displayTree(data);
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.error(errorThrown);
+        }
+    });
+    $(document).ready(function ()
+        {
+            //parte do ajax
+            
+            //fim ajax
+        
+        
+        var dataJson = JSON.parse(data_2);
+            $('#html1').jstree
+            (
+                {
+                    "core": {
+                        "themes": {
+                            "variant": "large"
+                        },
+                        "max_children":2
+                    },
+                    "plugins": ["contextmenu", "dnd", "search",
+                        "state", "types", "wholerow"],
+                    "root": 
+                    {
+                        
+                        "valid_children": ["default"]
+                    }
+                }
+            );
+            
+            $('#teste').jstree
+            ({
+                "core":
+                {
+                   
+                    "data": ['simple root node',data ]
+                      
+                },
+                "plugins": ["contextmenu", "dnd", "search",
+                    "state", "types", "wholerow"],
+            })//end teste.jstree */
+        
+    });
+</script>
+*@

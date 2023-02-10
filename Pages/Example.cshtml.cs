@@ -9,6 +9,9 @@ using System.Linq.Expressions;
 using XmlWebEditor.Controller;
 using System.Text;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.Intrinsics.X86;
+using System.Web;
 
 namespace XmlWebEditor.Pages
 {
@@ -23,21 +26,30 @@ namespace XmlWebEditor.Pages
 
         private string fileName = "auxText";
 
+        public TextMananger textMananger= new TextMananger();
+
         public ExampleModel(IWebHostEnvironment _environment)
         {
             environment = _environment;
         }
-        public void xml_tree()
+        public string getFile()
         {
-            string file = Path.Combine(environment.ContentRootPath, "xml", fileName+".xml");
-            XmlDocument document= new XmlDocument();
-            document.LoadXml(file);
-
-
+            return Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
         }
-
+        public void OnGet()
+        {
+            texto2 = textMananger.NewJsonFile(environment, fileName);
+        }
+        /*
+         * ver mais tarde:
+        [HttpGet]
+        public ActionResult JsTreeDemo()
+        {
+            return View();
+        }
+        */
         //private string file = Path.Combine(environment.ContentRootPath, "xml", fileName);
-       
+
 
     }
 }
