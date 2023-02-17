@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.StaticFiles;
+﻿using AjaxControlToolkit;
+using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -6,6 +8,7 @@ using System;
 using System.IO;
 using System.Net.Mime;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.Json;
 using System.Web.Helpers;
@@ -94,7 +97,7 @@ namespace XmlWebEditor.Controller
                 return json;
             }
         }//end VerifyJson
-        public string SetXmlFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
+        public string SetFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
         {
             try
             {
@@ -187,7 +190,6 @@ namespace XmlWebEditor.Controller
                 return xml;
             }
         }//end UpdateXmlFile
-
         public string UpdateJsonFile(IWebHostEnvironment environment, string fileName, string xmlText, ref string error)
         {
             string json = xmlText;
@@ -202,8 +204,9 @@ namespace XmlWebEditor.Controller
                 File.WriteAllTextAsync(fileAux, xmlText);
                 /*Resumidamente: File.WriteallTextAsync necessita de tempo
                  * para atualizar e então o document.load poder ser utilizado, por isto:
-                 * */
+                */
                 //Thread.Sleep(100);
+                //obs: por enquanto aos testes não fora mais necessário, porém deixo aqui "em caso de" 
                 File.Copy(fileAux, file, true);
                 return json;
 
@@ -221,6 +224,78 @@ namespace XmlWebEditor.Controller
                 return json;
             }
         }//end UpdateJsonFile
+
+       
+        private string textToWriteJson(dynamic data)//texto feito para atualizar 
+        {
+            StringBuilder sb = new StringBuilder();
+            StringWriter sw = new StringWriter(sb);
+            using (JsonWriter writer = new JsonTextWriter(sw))
+            {
+                
+                writer.Formatting = Newtonsoft.Json.Formatting.Indented;
+                foreach (var father in data)
+                {
+                    if (father.children.Count < 1)
+                    {
+                        sb.Append(", ");
+                        writer.WriteValue(father.text);
+                        continue;
+                    }
+                    else
+                    {
+                        writer.WriteStartObject();
+                        writer.WritePropertyName((string)father.text);
+                    }
+                    if (father.children.Count > 1)
+                    {
+                        writer.WriteStartArray();
+                        var variable = textToWriteJson(father.children);
+                        
+                        sb.Append(variable);
+                        writer.WriteEndArray();
+                    }
+                    else
+                    foreach (var child in father.children)
+                    {
+                        if (child.children.Count>1)
+                        {
+                            writer.WriteStartArray();
+                            var variable = textToWriteJson(father.children);
+                            sb.Append(variable);
+                            writer.Flush();
+                            writer.WriteEndArray();
+                            }
+                        else if (child.children.Count==1)
+                        {
+                            var variable = textToWriteJson(father.children);
+                            sb.Append(variable);
+                            writer.Flush();
+                        }
+                        else
+                        {
+                                
+                                writer.WriteValue(child.text);
+                        }
+                    }
+                }
+                if(!(sb.ToString()).EndsWith("}"))
+                    writer.WriteEndObject();
+                
+            }
+            string jsonstring = sb.ToString();
+            return jsonstring.Replace("null","");
+        }
+        // FIM MINHA VERSÃO*/
+        public string ConvertJstree(IWebHostEnvironment environment, string fileName, ref string error,string text1,string jstree)
+        {
+            XmlDocument auxdoc = new XmlDocument();
+            // parece que não dá para chamar o descerialize dentro de outro descerialize, por isto:
+            dynamic jsonAux = JsonConvert.DeserializeObject(jstree);
+            //teste
+            string finalJson = textToWriteJson(jsonAux); ; //textToWriteJson(jsonAux);
+            return finalJson;
+        }
 
     }//end TextMananger
 

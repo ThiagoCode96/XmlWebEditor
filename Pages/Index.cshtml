@@ -1,16 +1,29 @@
 ﻿@page
+@using Newtonsoft.Json;
+@using System.Xml;
 @model IndexModel
 
 
 @{
     ViewData["Title"] = "Xml/JsonEditor";
     string document ="";
+    XmlDocument docx = new XmlDocument();//docx para o jstree
     if (Model.text1.StartsWith("<"))
+    {
         document = "xml";
+       if (Model.text2==null)
+        docx.LoadXml(Model.text1);
+       else
+        docx.LoadXml(Model.text2);
+    }
     else if (Model.text1.StartsWith("{") || Model.text1.StartsWith("["))
+    {
+       
         document = "json";
-    
 
+    }
+
+    
     
         
 }
@@ -42,6 +55,9 @@
         <form asp-page-handler="jsonTextStart" method="post" enctype="multipart/form-data">
             <button class="btn btn-default"> novo Json </button>
         </form>
+        @*
+            verifica se é XmL ou Json antes de salvar para não ocorrer problemas
+        *@
         @if (document=="xml")
         {
 
@@ -88,18 +104,90 @@
             </form>
         </div>
        <div>
-            <form>
+            @*"*@
+            <form asp-page-handler="jstreeToData" method="post">
                 <div>
                     <p>nodes</p>
-                    @*
-                        teóricamente, aqui era para ter nodos também, por isto o forms e o atualizar.
-                        Porém como eu não consegui fazer por enquanto estará aí como um "TODO"
-                    *@
                     
-                    <button type="submit">atualizar</button>
+                    <button class="btn btn-default" type="submit" onclick="return updateJson()" >atualizar</button>
+                    @*
+                    script para o usuário ver o arquivo json
+                    *@
+                    <script>
+                        function updateJson() {
+                            var tree = $('#nodos').jstree(true).get_json('#', { flat: false });
+                            // Convert the result to a JSON string
+                            document.getElementById("jstreeData").value=JSON.stringify(tree);
+                            
+                        }
+                    </script>
+                    <input id="jstreeData" name="jstreeData" type="hidden" value="{}" runat="server" />
                 </div>
+                @*
+                    textarea antigo
                 <textarea class="xml-text" name="xml2" rows="12" cols="80" readonly>@Model.text2</textarea>
+                *@            
             </form>
+            <div id="nodos"></div>
        </div>
     </div>
+
+    <script>
+        $(document).ready(function () 
+        {
+            var treedoc;
+            if ("@document" == "json") {
+                treedoc= JSON.parse(@Html.Raw(Json.Serialize(Model.text1))) 
+            }
+            else if ("@document" == "xml")
+                treedoc= JSON.parse(@Html.Raw(Json.Serialize(JsonConvert.SerializeXmlNode(docx))))
+                
+
+            $('#nodos').jstree // @*segura isto: @Html.Raw(Model.getFile().Replace(@"\", "/"))"*@
+                ({
+                   
+                    "core": {
+                        "animation": 0,
+                        "check_callback": true,
+                        "themes": {
+                            "variant": "large", "stripes": true
+                        },
+                        'check_callback': true,
+                        data: jsonToJsTreeObject(treedoc)
+                    },
+                    "plugins": ["contextmenu", "dnd", "search",
+                        "state", "types", "wholerow"],
+                    "root": {
+                        "valid_children": ["default"]
+                    }
+                    
+                })
+
+            ///TESTE DE JAVASCRIPT
+            //var tree = $('#nodos').jstree().get_json( node, li_attr, a_attr );
+            ///FIM TESTE DE JAVASCRIPT
+        }
+        );
+        //JSTREE PARA JS
+        //Função criada por mustafakadwa52 na URL: https://github.com/vakata/jstree/issues/2405
+        //SIM! FUNCIONOU!
+        function jsonToJsTreeObject(json_data_object, final_array = new Array()) {
+            Object.keys(json_data_object).forEach(function (data) {
+                // console.log("Key:" + data);
+                if (Array.isArray(json_data_object[data]) || json_data_object[data] instanceof Object) {
+                    final_array.push({ text: `${data}`, children: jsonToJsTreeObject(json_data_object[data], new Array()) });
+                    // using state attribute
+                    // final_array.push( { text: `${data}`, state : {  'opened' : false, 'selected' : false }, children: jsonToJsTreeObject( json_data_object[data], new Array() ) } );
+                }
+                else {
+                    final_array.push({ text: `${data}`, children: [{ text: `${json_data_object[data]}` }] });
+                    // using state attribute
+                    // final_array.push( { text: `${data}`, state : {  'opened' : false, 'selected' : false }, children: [{ text: `${json_data_object[data]}` }] } );
+                }
+            });
+
+            return final_array;
+        }
+
+    </script>
 </div>

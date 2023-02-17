@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using System.Runtime.InteropServices.JavaScript;
 using System.Runtime.Intrinsics.X86;
 using System.Web;
+using Microsoft.AspNetCore.Hosting.Server;
+using System;
+using System.Web.Helpers;
 
 namespace XmlWebEditor.Pages
 {
@@ -24,32 +27,33 @@ namespace XmlWebEditor.Pages
         public IFormFile Upload { get; set; }
         public string texto2 { get; set; }
 
-        private string fileName = "auxText";
+        public string fileName = "auxArchive";
 
         public TextMananger textMananger= new TextMananger();
 
         public ExampleModel(IWebHostEnvironment _environment)
         {
             environment = _environment;
+            
         }
         public string getFile()
         {
-            return Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            
+            return Path.Combine(environment.WebRootPath, "xml", fileName + ".json");
         }
         public void OnGet()
         {
             texto2 = textMananger.NewJsonFile(environment, fileName);
-        }
-        /*
-         * ver mais tarde:
-        [HttpGet]
-        public ActionResult JsTreeDemo()
-        {
-            return View();
-        }
-        */
-        //private string file = Path.Combine(environment.ContentRootPath, "xml", fileName);
 
+        }
+        [HttpGet]
+        public IActionResult GetData()
+        {
+            var filePath = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            var jsonData = System.IO.File.ReadAllText(filePath);
+
+            return new OkObjectResult(jsonData);
+        }
 
     }
 }

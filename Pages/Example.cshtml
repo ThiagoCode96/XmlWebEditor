@@ -4,11 +4,8 @@
     ViewData["Title"] = "teste";
     var result = ViewData["result"];
     var file = Model.getFile();
+    
 }
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
-
-<!-- Syncfusion ASP.NET Core controls styles -->
-<link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/20.4.48/fluent.css" />
 
 
 <div>
@@ -24,9 +21,112 @@
         <li>Root node 2</li>
     </ul>
 </div>
-<div id="teste"></div>
+<div id="html2">
+</div>
+@*
+</div
+<asp:TreeViewID="teste" runat="server" style="ChildNodePadding:20">teste
+    <asp:TreeViewID="teste" runat="server">
+        teste
+     </asp:TreeViewID>
 
+</asp:TreeViewID>
+@*
+    TENTANDO FAZER TREEVIEWS DO ZERO DESEJE-ME SORTE
+*@
+@*
+<div id="treeviewTeste">
+    <ul id="myUL">
+        <li>
+            <span class="caret">teste1</span>
+            <ul class="nested">
+                <li><textarea>teste</textarea></li>
+                <li>Coffee</li>
+                <li>
+                    <span class="caret">Tea</span>
+                    <ul class="nested">
+                        <li>Black Tea</li>
+                        <li>White Tea</li>
+                        <li>
+                            <span class="caret">Green Tea</span>
+                            <ul class="nested">
+                                <li>Sencha</li>
+                                <li>Gyokuro</li>
+                                <li>Matcha</li>
+                                <li>Pi Lo Chun</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
 
+@*
+    o CSS
+*@
+
+@*
+<style>
+    /* Remove default bullets */
+    ul, #myUL {
+        list-style-type: none;
+    }
+
+    /* Remove margins and padding from the parent ul */
+    #myUL {
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Style the caret/arrow */
+    .caret {
+        cursor: pointer;
+        user-select: none; /* Prevent text selection */
+    }
+
+        /* Create the caret/arrow with a unicode, and style it */
+        .caret::before {
+            content: "\25B6";
+            color: black;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+    /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+    .caret-down::before {
+        transform: rotate(90deg);
+    }
+
+    /* Hide the nested list */
+    .nested {
+        display: none;
+    }
+
+    /* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+    .active {
+        display: block;
+    }
+</style>
+
+@*
+    script
+*@
+@*
+<script>
+    var toggler = document.getElementsByClassName("caret");
+var i;
+
+for (i = 0; i < toggler.length; i++) {
+  toggler[i].addEventListener("click", function() {
+    this.parentElement.querySelector(".nested").classList.toggle("active");
+    this.classList.toggle("caret-down");
+  });
+}
+</script>
+
+@*END COMENT*@
 
 
 
@@ -55,64 +155,75 @@
     *
     VERIFICAR DEPOIS ABAIXO.
 
-
+    *@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
-<script type="text/javascript" src="~/wwwroot/js/jsTreeHelper.js" id="treehelper"></script>
 
 <script>
-    let data_2 = @Html.Raw(Json.Serialize(Model.texto2));
-    
-    $.ajax({
-        url: encodeURIComponent(@Html.Raw(file)),
-        dataType: 'json',
-        success: function (data) {
-            displayTree(data);
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.error(errorThrown);
-        }
-    });
+   
+
     $(document).ready(function ()
+    {
+
+        let filePath = "@Html.Raw(Model.getFile().Replace(@"\", "/"))";
+        $('#html1').jstree
+        (
         {
-            //parte do ajax
-            
-            //fim ajax
-        
-        
-        var dataJson = JSON.parse(data_2);
-            $('#html1').jstree
+            "core": {
+                "themes": {
+                    "variant": "large"
+                },
+                "max_children":2
+        },
+            "plugins": ["contextmenu", "dnd", "search",
+                "state", "types", "wholerow"],
+                "root": {
+                    "valid_children": ["default"]
+                },
+                    "data": JSON.parse(@Html.Raw(Json.Serialize(Model.texto2)))
+            }
+        );
+        $('#html2').jstree // segura isto: @Html.Raw(Model.getFile().Replace(@"\", "/"))"
             (
                 {
                     "core": {
+                        "animation": 0,
+                        "check_callback": true,
                         "themes": {
-                            "variant": "large"
+                            "variant": "large", "stripes": true
                         },
-                        "max_children":2
+                        "data": jsonToJsTreeObject(JSON.parse(@Html.Raw(Json.Serialize(Model.texto2))))
                     },
                     "plugins": ["contextmenu", "dnd", "search",
                         "state", "types", "wholerow"],
-                    "root": 
-                    {
-                        
+                    "root": {
                         "valid_children": ["default"]
                     }
                 }
             );
-            
-            $('#teste').jstree
-            ({
-                "core":
-                {
-                   
-                    "data": ['simple root node',data ]
-                      
-                },
-                "plugins": ["contextmenu", "dnd", "search",
-                    "state", "types", "wholerow"],
-            })//end teste.jstree */
-        
     });
+
+    var jsonData = $('#html2').jstree(true).get_json();
+   
+
+    //SIM, UM CARA CRIOU UM NEGÓCIO PARA FAZER O JSTREE FUNCIONAR! TESTANDO...
+    //SIM! FUNCIONOU!
+    function jsonToJsTreeObject(json_data_object, final_array = new Array()) {
+        Object.keys(json_data_object).forEach(function (data) {
+            // console.log("Key:" + data);
+            if (Array.isArray(json_data_object[data]) || json_data_object[data] instanceof Object) {
+                final_array.push({ text: `${data}`, children: jsonToJsTreeObject(json_data_object[data], new Array()) });
+                // using state attribute
+                // final_array.push( { text: `${data}`, state : {  'opened' : false, 'selected' : false }, children: jsonToJsTreeObject( json_data_object[data], new Array() ) } );
+            }
+            else {
+                final_array.push({ text: `${data}`, children: [{ text: `${json_data_object[data]}` }] });
+                // using state attribute
+                // final_array.push( { text: `${data}`, state : {  'opened' : false, 'selected' : false }, children: [{ text: `${json_data_object[data]}` }] } );
+            }
+        });
+
+        return final_array;
+    }
 </script>
-*@

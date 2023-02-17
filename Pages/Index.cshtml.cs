@@ -13,6 +13,9 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Hosting.Server;
 using System.Reflection;
+using Newtonsoft.Json;
+using System.Text.Json.Nodes;
+using Newtonsoft.Json.Linq;
 
 namespace XmlWebEditor.Pages
 {
@@ -35,19 +38,19 @@ namespace XmlWebEditor.Pages
         public bool IsResponse { get; set; }
         public string message = "";
         private string fileName = "auxArchive";
-        TextMananger xmlUpdate = new TextMananger();
+        TextMananger textUpdate = new TextMananger();
         public void OnGet()
         {
-            text1 = xmlUpdate.NewJsonFile(environment, fileName);//limpar o Json
-            text1 = xmlUpdate.NewXmlFile(environment, fileName);//limpar o Xml
+            text1 = textUpdate.NewJsonFile(environment, fileName);//limpar o Json
+            text1 = textUpdate.NewXmlFile(environment, fileName);//limpar o Xml
         }
         public void OnPostXmlTextStart()
         {
-            text1 = xmlUpdate.NewXmlFile(environment, fileName);
+            text1 = textUpdate.NewXmlFile(environment, fileName);
         }
         public void OnPostJsonTextStart()
         {
-            text1 = xmlUpdate.NewJsonFile(environment, fileName);
+            text1 = textUpdate.NewJsonFile(environment, fileName);
         }
         /*
          * fução que controla a entrada e saída dos dois textos
@@ -61,7 +64,7 @@ namespace XmlWebEditor.Pages
 
 
 
-            text2 += xmlUpdate.UpdateFile(environment, fileName, aux, ref message);
+            text2 += textUpdate.UpdateFile(environment, fileName, aux, ref message);
             if (message != "")
             {
                 IsResponse = true;
@@ -79,7 +82,7 @@ namespace XmlWebEditor.Pages
         {
             if (Upload == null)
                 return;
-            text1 = xmlUpdate.SetXmlFile(Upload, environment, fileName, ref message);
+            text1 = textUpdate.SetFile(Upload, environment, fileName, ref message);
             if (message != "")
             {
                 if (message.Contains("documento inválido"))
@@ -149,8 +152,16 @@ namespace XmlWebEditor.Pages
             }
         }//fim GetJsonFile
 
+        public void OnPostJstreeToData (string jstreeData)
+        {
+            //JObject jsonObject = JObject.Parse(jstreeData);
+            //XNode xml = JsonConvert.DeserializeXNode(jsonObject.ToString(), "root");
+            int tet = 0;
+            text1= textUpdate.ConvertJstree(environment, fileName,ref message, text1, jstreeData);
+            tet = 2;
+        }
 
-        
+
     }//Fim Classe IndexModel
     /*
          ************************************************

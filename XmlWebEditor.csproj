@@ -7,8 +7,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\xml\asd.xml" />
+    <Content Remove="wwwroot\xml\auxArchive" />
+    <Content Remove="wwwroot\xml\auxArchive.xml" />
+    <Content Remove="wwwroot\xml\auxText" />
+    <Content Remove="wwwroot\xml\fileAux.xml" />
+    <Content Remove="wwwroot\xml\NewFile.xml" />
+    <Content Remove="wwwroot\xml\xmlArchive.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="wwwroot\xml\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\xml\asd.xml" />
+    <None Include="wwwroot\xml\auxArchive" />
+    <None Include="wwwroot\xml\auxArchive.xml" />
+    <None Include="wwwroot\xml\auxText" />
+    <None Include="wwwroot\xml\fileAux.xml" />
+    <None Include="wwwroot\xml\NewFile.xml" />
+    <None Include="wwwroot\xml\xmlArchive.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +35,18 @@
     <PackageReference Include="jsTree" Version="3.1.1.2" />
     <PackageReference Include="Microsoft.AspNet.WebHelpers" Version="3.2.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\xml\auxArchive.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\xml\fileAux.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\xml\NewFile.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
