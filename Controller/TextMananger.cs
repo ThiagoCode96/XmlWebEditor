@@ -258,7 +258,7 @@ namespace XmlWebEditor.Controller
                     sb.Append("{" + total + "}");
                     break;
                 }
-                else if (item.children.Count == 1)
+                else if (item.children.Count >= 1)
                 {
                     nome = "\"" + (string)item.text + "\"";
                     chave = CaptureText(item.children);
@@ -288,7 +288,7 @@ namespace XmlWebEditor.Controller
                 nome = "\""+(string)item.text+ "\"";
                 chave = CaptureText(item.children);
                 sb.Append( nome+":" +  chave);
-                sb.Append(",\r");
+                sb.Append(",");
                
 
             }
@@ -301,125 +301,31 @@ namespace XmlWebEditor.Controller
        }
         
     
-            /*// início de minha versão
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-               
-                writer.Formatting = Newtonsoft.Json.Formatting.Indented;
-                foreach (var father in data)
-                {
-                    //isto é para pegar os arrays que ficam dentro do JSTree em numerais.
-                    //Se o data é maior que 1 e int é só números ou é só texto ele abre um array,
-                    //coloca o que tem que colocar e fecha o array
-                    if (data.Count>=1 && (int.TryParse((string)father.text,out int fth) || father.text=="0"))
-                    {
-                        var value="";
-                        writer.WriteStartArray();
-                        foreach (var arrayFather in data)
-                        {
-                            if (arrayFather.children.Count == 1)//é um array 
-                            {
-
-                                foreach (var number in data)
-                                { //dentro dos números
-                                    foreach (var child2 in number.children)//o texto de dentro destes números
-                                    {
-                                        if (child2.children.Count >= 1)
-                                            break;
-                                        writer.WriteValue(child2.text);
-                                    }
-                                    break;
-                                }
-                            }
-                            else {
-                                    value = textToWriteJson(arrayFather.children);
-                                    sb.Append(value);
-                                    if(data.Count>1)//caso tenha mais de um
-                                        sb.Append(",");
-                                }
-                        }
-                        writer.WriteEndArray();
-                        break;
-                    }
-                    else
-                    {
-                        if (sb.Length == 0)
-                        { //final de algum objeto ou está vazio
-                            writer.WriteStartObject();
-                        }
-                        else if (sb.ToString().EndsWith("]"))//terminou array de dados
-                        {
-                            writer.WriteEndObject();
-                            sb.Append(",");
-                            
-
-                        }
-                        else if (sb.ToString().EndsWith("}")&& data.Count>1)
-                        {
-                            writer.WriteRaw(",");
-                            writer.WriteStartObject();
-                            sb.Remove(sb.Length - 1, 1);
-                            isContinue = true;
-                        }
-
-                        writer.WritePropertyName((string)father.text);
-                }
-                    foreach (var child in father.children)
-                    {
-                        if (child.children.Count >= 1 && (int.TryParse((string)child.text, out int ch) || child.text == "0"))
-                        {
-                            var variable = textToWriteJson(father.children);
-                            sb.Append(variable);
-                            writer.Flush();
-                            break;
-                        }   
-                        else if (child.children.Count>=1)//se é uma propriedade entro de uma propriedade
-                        {
-                            var variable = textToWriteJson(father.children);
-                            sb.Append(variable);
-                            writer.Flush();
-                            break;
-                        } 
-                        else
-                        {
-                                
-                                writer.WriteValue(child.text);
-                        }
-                    }
-                }
-                string jsonstring2;//coloquei este string aqui para parar o try catch de dar erro
-                //parece estranho o que eu fiz, mas é simples: se puder fechar o programa fecha.senão apenas retorna o necessário
-                try
-                {
-
-                    writer.WriteEndObject();
-                    if(isContinue==true)
-                        sb.Remove(sb.Length - 1, 1);
-                }
-                catch {
-
-                     jsonstring2= sb.ToString();
-                    return jsonstring2.Replace("null", "");
-
-                }
-            }
-
-            string jsonstring = sb.ToString();
-            return jsonstring.Replace("null", "");
-        }
-        // FIM MINHA VERSÃO*/
+            
         public string ConvertJstree(IWebHostEnvironment environment, string fileName, ref string error,string document,string jstree)
         {
             XmlDocument auxdoc = new XmlDocument();
             // parece que não dá para chamar o descerialize dentro de outro descerialize, por isto:
             dynamic jsonAux = JsonConvert.DeserializeObject(jstree);
-            //abaixo está escrito assim para ser devolvido identado e sem erros (deserialize realinha os colchetes, serialize devolve em string e o json format identa
+            //colocado um adicional para verificar o retorno do arquivo em txt na depuração
             string updatedJson = TextToWriteJson(jsonAux);
+            //abaixo está escrito assim para ser devolvido identado e sem erros (deserialize realinha os colchetes, serialize devolve em string e o json format identa
+
             string finalJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(updatedJson), Newtonsoft.Json.Formatting.Indented);
 
             if (document=="xml") {
+                //iniciando identação
                 XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(finalJson);
-                return doc.ToString();
+                doc.PreserveWhitespace = true;
+                //identação do XML
+                StringWriter stringWriter = new StringWriter();
+                XmlTextWriter xmlTextWriter = new XmlTextWriter(stringWriter);
+                xmlTextWriter.Formatting = System.Xml.Formatting.Indented;
+
+                doc.WriteContentTo(xmlTextWriter);
+                xmlTextWriter.Flush();
+
+                return stringWriter.ToString();
             }
             return finalJson;
         }

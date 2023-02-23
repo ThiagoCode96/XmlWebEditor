@@ -107,7 +107,7 @@
             @*"*@
             <form asp-page-handler="jstreeToData" method="post">
                 <div>
-                    <p>nodes</p>
+                    <p>nodes: Atenção: para inserção de 2 ou mais elementos num mesmo objeto (como "objeto":["1","2"]) por favor colocar os objetos numerados como no exemplo do novo JSON</p>
                     
                     <button class="btn btn-default" type="submit" onclick="return updateJson()" >atualizar</button>
                     @*
@@ -122,7 +122,9 @@
                         }
                     </script>
                     <input id="jstreeData" name="jstreeData" type="hidden"  runat="server" />
-                    <input type="hidden" name="document" id="asd" runat="server" />
+                    @if(document=="xml"){
+                        <input type="hidden" name="document" value="xml" runat="server" />
+                    }
                 </div>
                 @*
                     textarea antigo
