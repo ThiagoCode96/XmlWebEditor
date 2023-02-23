@@ -1,17 +1,70 @@
 {
-  "root":{
-  "branch":{
-  "":{
-  "New node":{
-  "New node":{
-  "New node":{
-  "New node":{
-  "New node": "New node"
-} 
-} 
-} 
-} 
-} 
-} 
-} 
+  "@context": "http://schema.org",
+  "@type": ["CreativeWork", "ReportageNewsArticle"],
+  "url": "https://www1.folha.uol.com.br/colunas/monicabergamo/2023/02/moradores-de-maresias-rebatem-prefeito-sobre-habitacao-popular-queria-colocar-casas-em-um-charco.shtml",
+  "mainEntityOfPage": "https://www1.folha.uol.com.br/colunas/monicabergamo/2023/02/moradores-de-maresias-rebatem-prefeito-sobre-habitacao-popular-queria-colocar-casas-em-um-charco.shtml",
+  "headline": "Moradores de Maresias rebatem prefeito sobre habita\u00e7\u00e3o popular: 'Queria colocar casas em um charco'",
+  "description": "Felipe Augusto afirma que pessoas de m\u00e9dia e alta renda impediram projeto de constru\u00e7\u00e3o de 400 casas",
+  "datePublished": "2023-02-23T14:33:00Z",
+      "image": { "@type": "ImageObject", "url": "https://f.i.uol.com.br/fotografia/2023/02/22/167710956063f6a93864a3d_1677109560_3x2_md.jpg", "width": "768", "height": "512" },
+      
+  "author": [{
+    "@type": "Person",
+    "name": "M\u00f4nica Bergamo",
+    "description": "Jornalista, assina coluna que leva seu nome, com informa\u00e7\u00f5es sobre diversas \u00e1reas, entre pol\u00edtica, cultura e cidades. Est\u00e1 na Folha desde 1999, ap\u00f3s ter passado pelas revistas Playboy e Veja e ter dirigido a sucursal de Bras\u00edlia da Bandeirantes.",
+    "image": "https://f.i.uol.com.br/fotografia/2019/02/26/15512129685c75a1a80d286_1551212968_1x1_xs.jpg",
+        "sameAs": ["https://www1.folha.uol.com.br/autores/monica-bergamo.shtml","https://twitter.com/monicabergamo"],
+        "workLocation": {
+      "@type": "Place",
+      "name": "São Paulo"
+    }
+  }],
+      "publisher": {
+    "@type": "NewsMediaOrganization",
+    "@id" : "https://www1.folha.uol.com.br#organization",
+    "name": "Folha de S.Paulo",
+    "url": "https://www1.folha.uol.com.br",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://f.i.uol.com.br/hunting/folha/1/amp/logo.png",
+      "width": 600,
+      "height": 60
+    },
+    "ethicsPolicy": "https://temas.folha.uol.com.br/projeto-editorial-da-folha/projeto-editorial-folha-de-s-paulo/principios-editoriais.shtml",
+    "diversityPolicy": "https://temas.folha.uol.com.br/projeto-editorial-da-folha/projeto-editorial-folha-de-s-paulo/principios-editoriais.shtml",
+    "correctionsPolicy": "https://temas.folha.uol.com.br/folha-projeto-editorial/manual-de-redacao-conduta/erramos.shtml",
+    "ownershipFundingInfo": "https://www1.folha.uol.com.br/institucional/",
+    "foundingDate": "1921-02-19",
+    "masthead": "https://www1.folha.uol.com.br/institucional/expediente.shtml",
+    "missionCoveragePrioritiesPolicy": "https://temas.folha.uol.com.br/projeto-editorial-da-folha/projeto-editorial-folha-de-s-paulo/sua-excelencia-o-consumidor-de-noticias.shtml",
+    "verificationFactCheckingPolicy": "https://temas.folha.uol.com.br/folha-projeto-editorial/manual-de-redacao-conduta/conduta.shtml",
+    "unnamedSourcesPolicy": "https://temas.folha.uol.com.br/projeto-editorial-da-folha/projeto-editorial-folha-de-s-paulo/principios-editoriais.shtml",
+    "actionableFeedbackPolicy": "https://www1.folha.uol.com.br/falecomafolha/",
+    "diversityStaffingReport": "https://temas.folha.uol.com.br/folha-projeto-editorial/manual-de-redacao-conduta/politica-de-diversidade.shtml",
+    "contactPoint": [{
+      "@type": "ContactPoint",
+      "contactType": "Newsroom Contact",
+      "url": "https://www1.folha.uol.com.br/falecomafolha/"
+      },{
+      "@type": "ContactPoint",
+      "contactType": "Public Engagement",
+      "url": "https://www1.folha.uol.com.br/falecomafolha/"
+    }]
+  },
+  "publishingPrinciples": "https://temas.folha.uol.com.br/folha-projeto-editorial/manual-de-redacao-conduta/atuacao-profissional.shtml"
+,
+  "isAccessibleForFree": false,
+  "hasPart": {
+    "@type": "WebPageElement",
+    "isAccessibleForFree": false,
+    "cssSelector": ".j-paywall"
+  },
+  "isPartOf": {
+    "@type": [
+      "CreativeWork",
+      "Product"
+    ],
+    "name": "Folha de S.Paulo",
+    "productID": "folha.uol.com.br:news"
+  }
 }

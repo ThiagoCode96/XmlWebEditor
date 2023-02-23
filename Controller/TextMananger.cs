@@ -1,10 +1,12 @@
 ﻿using AjaxControlToolkit;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Data;
 using System.IO;
 using System.Net.Mime;
 using System.Reflection.Metadata;
@@ -12,18 +14,20 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.Json;
 using System.Web.Helpers;
+using System.Web.Razor.Generator;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace XmlWebEditor.Controller
 {
     public class TextMananger
     {
-        public string VefiryXml(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
+        public string VefiryXml(IFormFile Upload, IWebHostEnvironment environment, string fileName, ref string error)
         {
-            
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName+".xml");
+
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
             string xml = "";
             try
             {
@@ -49,21 +53,21 @@ namespace XmlWebEditor.Controller
             }
             catch (XmlException e)
             {
-                if(e.Message== "Data at the root level is invalid. Line 1, position 1.")
+                if (e.Message == "Data at the root level is invalid. Line 1, position 1.")
                 {
                     error = "documento inválido. por favor, digite um documento XML válido";
                     return xml;
                 }
-                error= "erro na linha " + e.LineNumber + " na posição: " +
+                error = "erro na linha " + e.LineNumber + " na posição: " +
                     e.LinePosition + " o erro:  " + e.Message;
                 return xml;
             }
-            
+
         }//end XmlVerification
         public string VerifyJson(IFormFile Upload, IWebHostEnvironment environment, string fileName, ref string error)
         {
 
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName+".json");
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
             string json = "";
             try
             {
@@ -97,7 +101,7 @@ namespace XmlWebEditor.Controller
                 return json;
             }
         }//end VerifyJson
-        public string SetFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,ref string error)
+        public string SetFile(IFormFile Upload, IWebHostEnvironment environment, string fileName, ref string error)
         {
             try
             {
@@ -111,7 +115,7 @@ namespace XmlWebEditor.Controller
             }
             catch (System.NullReferenceException)
             {
-                error="Por favor, insira um documento Xml ou Json";
+                error = "Por favor, insira um documento Xml ou Json";
                 return "";
             }
         }//end SetXmlFile
@@ -120,8 +124,8 @@ namespace XmlWebEditor.Controller
             string aux = "";
             var file = Path.Combine(environment.ContentRootPath, "xml", fileName);
             var newFile = Path.Combine(environment.ContentRootPath, "xml", "NewFile.xml");
-            File.Copy(newFile,file,true);
-            aux=File.ReadAllText(newFile);
+            File.Copy(newFile, file, true);
+            aux = File.ReadAllText(newFile);
             return aux;
         }// end NewXmlFile
         public string NewJsonFile(IWebHostEnvironment environment, string fileName)
@@ -133,14 +137,14 @@ namespace XmlWebEditor.Controller
             aux = File.ReadAllText(newFile);
             return aux;
         }// end NewXmlFile
-        public string UpdateFile(IWebHostEnvironment environment, string fileName,string xmlText, ref string error)
+        public string UpdateFile(IWebHostEnvironment environment, string fileName, string xmlText, ref string error)
         {
             try
             {
 
                 if (xmlText.StartsWith("<"))
                 {
-                   
+
                     return UpdateXmlFile(environment, fileName, xmlText, ref error);
                 }
                 else if (xmlText.StartsWith("{") || xmlText.StartsWith("["))
@@ -224,54 +228,158 @@ namespace XmlWebEditor.Controller
                 return json;
             }
         }//end UpdateJsonFile
-
-       
-        private string textToWriteJson(dynamic data)//texto feito para atualizar 
+        private string CaptureText(dynamic data)
         {
             StringBuilder sb = new StringBuilder();
+            foreach(dynamic item in data)
+            {
+                string chave = "", nome;
+                if (data.Count >= 1 && item.children.Count>0 && (int.TryParse((string)item.text, out int ch) || item.text == "0"))
+                {
+                    foreach (dynamic itemChildren in data)
+                    {
+                        chave += CaptureText(itemChildren.children);
+                        chave += ",";
+                    }
+                    chave=chave.Remove(chave.Length - 1, 1);//limpar a última vírgula
+                    sb.Append("["+ chave+"]" );
+                    break;
+                }
+                else if (data.Count > 1)
+                {
+                    string total = "";
+                    foreach (dynamic itemChildren in data)
+                    {
+                        nome = "\"" + (string)itemChildren.text + "\"";
+                        chave = CaptureText(itemChildren.children);
+                        total += nome + ":" + chave + ",";
+                    }
+                    total = total.Remove(total.Length - 1, 1);//limpar a última vírgula
+                    sb.Append("{" + total + "}");
+                    break;
+                }
+                else if (item.children.Count == 1)
+                {
+                    nome = "\"" + (string)item.text + "\"";
+                    chave = CaptureText(item.children);
+                    sb.Append("{" + nome + ":" + chave + "}");
+
+                }
+                else
+                {
+                    sb.Append(("\"" + item.text.ToString() + "\""));
+                    if (data.Count > 1)
+                        sb.Append(",");
+                }
+            }
+            return sb.ToString();
+        }
+
+        private string TextToWriteJson(dynamic data)//texto feito para atualizar 
+        {
+            bool isContinue = false;//Para deletar o end object caso tenha continuação do caractere.
+            StringBuilder sb = new StringBuilder();
             StringWriter sw = new StringWriter(sb);
+            string chave="",nome;
+            sb.Append("{");
+            foreach (dynamic item in data)
+            {
+                    
+                nome = "\""+(string)item.text+ "\"";
+                chave = CaptureText(item.children);
+                sb.Append( nome+":" +  chave);
+                sb.Append(",\r");
+               
+
+            }
+            sb.Remove(sb.Length - 1, 1);//deleta a ultima virgula
+            sb.Append("}");
+
+
+
+            return sb.ToString();
+       }
+        
+    
+            /*// início de minha versão
             using (JsonWriter writer = new JsonTextWriter(sw))
             {
-                
+               
                 writer.Formatting = Newtonsoft.Json.Formatting.Indented;
                 foreach (var father in data)
                 {
-                    if (father.children.Count < 1)
+                    //isto é para pegar os arrays que ficam dentro do JSTree em numerais.
+                    //Se o data é maior que 1 e int é só números ou é só texto ele abre um array,
+                    //coloca o que tem que colocar e fecha o array
+                    if (data.Count>=1 && (int.TryParse((string)father.text,out int fth) || father.text=="0"))
                     {
-                        sb.Append(", ");
-                        writer.WriteValue(father.text);
-                        continue;
-                    }
-                    else
-                    {
-                        writer.WriteStartObject();
-                        writer.WritePropertyName((string)father.text);
-                    }
-                    if (father.children.Count > 1)
-                    {
+                        var value="";
                         writer.WriteStartArray();
-                        var variable = textToWriteJson(father.children);
-                        
-                        sb.Append(variable);
+                        foreach (var arrayFather in data)
+                        {
+                            if (arrayFather.children.Count == 1)//é um array 
+                            {
+
+                                foreach (var number in data)
+                                { //dentro dos números
+                                    foreach (var child2 in number.children)//o texto de dentro destes números
+                                    {
+                                        if (child2.children.Count >= 1)
+                                            break;
+                                        writer.WriteValue(child2.text);
+                                    }
+                                    break;
+                                }
+                            }
+                            else {
+                                    value = textToWriteJson(arrayFather.children);
+                                    sb.Append(value);
+                                    if(data.Count>1)//caso tenha mais de um
+                                        sb.Append(",");
+                                }
+                        }
                         writer.WriteEndArray();
+                        break;
                     }
                     else
+                    {
+                        if (sb.Length == 0)
+                        { //final de algum objeto ou está vazio
+                            writer.WriteStartObject();
+                        }
+                        else if (sb.ToString().EndsWith("]"))//terminou array de dados
+                        {
+                            writer.WriteEndObject();
+                            sb.Append(",");
+                            
+
+                        }
+                        else if (sb.ToString().EndsWith("}")&& data.Count>1)
+                        {
+                            writer.WriteRaw(",");
+                            writer.WriteStartObject();
+                            sb.Remove(sb.Length - 1, 1);
+                            isContinue = true;
+                        }
+
+                        writer.WritePropertyName((string)father.text);
+                }
                     foreach (var child in father.children)
                     {
-                        if (child.children.Count>1)
-                        {
-                            writer.WriteStartArray();
-                            var variable = textToWriteJson(father.children);
-                            sb.Append(variable);
-                            writer.Flush();
-                            writer.WriteEndArray();
-                            }
-                        else if (child.children.Count==1)
+                        if (child.children.Count >= 1 && (int.TryParse((string)child.text, out int ch) || child.text == "0"))
                         {
                             var variable = textToWriteJson(father.children);
                             sb.Append(variable);
                             writer.Flush();
-                        }
+                            break;
+                        }   
+                        else if (child.children.Count>=1)//se é uma propriedade entro de uma propriedade
+                        {
+                            var variable = textToWriteJson(father.children);
+                            sb.Append(variable);
+                            writer.Flush();
+                            break;
+                        } 
                         else
                         {
                                 
@@ -279,21 +387,40 @@ namespace XmlWebEditor.Controller
                         }
                     }
                 }
-                if(!(sb.ToString()).EndsWith("}"))
+                string jsonstring2;//coloquei este string aqui para parar o try catch de dar erro
+                //parece estranho o que eu fiz, mas é simples: se puder fechar o programa fecha.senão apenas retorna o necessário
+                try
+                {
+
                     writer.WriteEndObject();
-                
+                    if(isContinue==true)
+                        sb.Remove(sb.Length - 1, 1);
+                }
+                catch {
+
+                     jsonstring2= sb.ToString();
+                    return jsonstring2.Replace("null", "");
+
+                }
             }
+
             string jsonstring = sb.ToString();
-            return jsonstring.Replace("null","");
+            return jsonstring.Replace("null", "");
         }
         // FIM MINHA VERSÃO*/
-        public string ConvertJstree(IWebHostEnvironment environment, string fileName, ref string error,string text1,string jstree)
+        public string ConvertJstree(IWebHostEnvironment environment, string fileName, ref string error,string document,string jstree)
         {
             XmlDocument auxdoc = new XmlDocument();
             // parece que não dá para chamar o descerialize dentro de outro descerialize, por isto:
             dynamic jsonAux = JsonConvert.DeserializeObject(jstree);
-            //teste
-            string finalJson = textToWriteJson(jsonAux); ; //textToWriteJson(jsonAux);
+            //abaixo está escrito assim para ser devolvido identado e sem erros (deserialize realinha os colchetes, serialize devolve em string e o json format identa
+            string updatedJson = TextToWriteJson(jsonAux);
+            string finalJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(updatedJson), Newtonsoft.Json.Formatting.Indented);
+
+            if (document=="xml") {
+                XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(finalJson);
+                return doc.ToString();
+            }
             return finalJson;
         }
 

@@ -152,13 +152,17 @@ namespace XmlWebEditor.Pages
             }
         }//fim GetJsonFile
 
-        public void OnPostJstreeToData (string jstreeData)
+        public void OnPostJstreeToData (string jstreeData, string document)
         {
-            //JObject jsonObject = JObject.Parse(jstreeData);
-            //XNode xml = JsonConvert.DeserializeXNode(jsonObject.ToString(), "root");
-            int tet = 0;
-            text1= textUpdate.ConvertJstree(environment, fileName,ref message, text1, jstreeData);
-            tet = 2;
+            text2 = "";
+            text2+= textUpdate.ConvertJstree(environment, fileName,ref message, document, jstreeData);
+            if (message != "")
+            {
+                IsResponse = true;
+                IsSuccess = false;
+            }
+            else
+                text1 = text2;
         }
 
 
