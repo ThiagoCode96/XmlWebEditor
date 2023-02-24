@@ -304,31 +304,35 @@ namespace XmlWebEditor.Controller
             
         public string ConvertJstree(IWebHostEnvironment environment, string fileName, ref string error,string document,string jstree)
         {
-            XmlDocument auxdoc = new XmlDocument();
-            // parece que não dá para chamar o descerialize dentro de outro descerialize, por isto:
-            dynamic jsonAux = JsonConvert.DeserializeObject(jstree);
-            //colocado um adicional para verificar o retorno do arquivo em txt na depuração
-            string updatedJson = TextToWriteJson(jsonAux);
-            //abaixo está escrito assim para ser devolvido identado e sem erros (deserialize realinha os colchetes, serialize devolve em string e o json format identa
+            try
+            {
+                XmlDocument auxdoc = new XmlDocument();
+                // parece que não dá para chamar o descerialize dentro de outro descerialize, por isto:
+                dynamic jsonAux = JsonConvert.DeserializeObject(jstree);
+                //colocado um adicional para verificar o retorno do arquivo em txt na depuração
+                string updatedJson = TextToWriteJson(jsonAux);
+                //abaixo está escrito assim para ser devolvido identado e sem erros (deserialize realinha os colchetes, serialize devolve em string e o json format identa
 
-            string finalJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(updatedJson), Newtonsoft.Json.Formatting.Indented);
 
-            if (document=="xml") {
-                //iniciando identação
-                XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(finalJson);
-                doc.PreserveWhitespace = true;
-                //identação do XML
-                StringWriter stringWriter = new StringWriter();
-                XmlTextWriter xmlTextWriter = new XmlTextWriter(stringWriter);
-                xmlTextWriter.Formatting = System.Xml.Formatting.Indented;
+                if (document == "xml")
+                {
+                    XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(updatedJson);
+                    doc.PreserveWhitespace = true;
+                    //identação do XML
+                    XDocument text = XDocument.Parse(doc.OuterXml);//automaticamente ident
+                    return text.ToString();
+                }
+                string finalJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(updatedJson), Newtonsoft.Json.Formatting.Indented);
 
-                doc.WriteContentTo(xmlTextWriter);
-                xmlTextWriter.Flush();
-
-                return stringWriter.ToString();
+                return finalJson;
             }
-            return finalJson;
+            catch 
+            {
+                error = "erro de edição. Verifique se o arquivo está conectado corretamente";
+                return "";
+            }
         }
+
 
     }//end TextMananger
 

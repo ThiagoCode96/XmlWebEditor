@@ -8,19 +8,26 @@
     ViewData["Title"] = "Xml/JsonEditor";
     string document ="";
     XmlDocument docx = new XmlDocument();//docx para o jstree
-    if (Model.text1.StartsWith("<"))
+    try
     {
-        document = "xml";
-       if (Model.text2==null)
-        docx.LoadXml(Model.text1);
-       else
-        docx.LoadXml(Model.text2);
-    }
-    else if (Model.text1.StartsWith("{") || Model.text1.StartsWith("["))
-    {
-       
-        document = "json";
+        if (Model.text1.StartsWith("<"))
+        {
+            document = "xml";
+            if (Model.text2 == null)
+                docx.LoadXml(Model.text1);
+            else
+                docx.LoadXml(Model.text2);
+        }
+        else if (Model.text1.StartsWith("{") || Model.text1.StartsWith("["))
+        {
 
+            document = "json";
+
+        }
+    }
+    catch
+    {
+        document = "error";
     }
 
     
@@ -62,16 +69,35 @@
         {
 
             <a class="btn btn-default" asp-page-handler="xmlFile">salvar </a>
+            <form asp-page-handler="xmlMinimize" method="post">
+                <button class="btn btn-default" type="submit">minimizar</button>
+            </form>
+            <form asp-page-handler="xmlIdent" method="post">
+                <button class="btn btn-default" type="submit">identar</button>
+            </form>
+            <form asp-page-handler="xmlToJson" method="post">
+                <button class="btn btn-default" type="submit">transformar em Json</button>
+            </form>
+
         }
         else if (document=="json")
         {
-           <a class="btn btn-default" asp-page-handler="jsonFile"> salvar </a>
+            <a class="btn btn-default" asp-page-handler="jsonFile"> salvar </a>
+            <form asp-page-handler="jsonMinimize" method="post">
+                <button class="btn btn-default" type="submit" >minimizar</button>
+            </form>
+            <form asp-page-handler="jsonIdent" method="post">
+                <button class="btn btn-default" type="submit">identar</button>
+            </form>
+            <form asp-page-handler="jsonToXml" method="post">
+                <button class="btn btn-default" type="submit">transformar em Xml</button>
+            </form>
             
         }
 
     </div>
     <div id="xml-archives">
-        <form asp-page-handler="xmlSetFile" method="post" enctype="multipart/form-data">
+        <form asp-page-handler="SetFile" method="post" enctype="multipart/form-data">
             <input type="file" class="form-control" id="fileInput" asp-for="Upload" />
 
             <button class="btn btn-default" type="submit"  onclick="return checkFileInput()"> abrir </button>

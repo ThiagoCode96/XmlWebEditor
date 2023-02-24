@@ -71,14 +71,17 @@ namespace XmlWebEditor.Pages
                 IsSuccess = false;
             }
             else
+            {
                 text1 = text2;
+                SaveFile(text1);
+            }
 
         }
         public void OnPost()
         {
 
         }
-        public void OnPostXmlSetFile()//send file to the textes
+        public void OnPostSetFile()//send file to the textes
         {
             if (Upload == null)
                 return;
@@ -150,29 +153,100 @@ namespace XmlWebEditor.Pages
                 IsSuccess = false;
                 return Redirect(Request.Headers["Referer"].ToString());//retun "null"
             }
-        }//fim GetJsonFile
+        }//fim GetXmlFile
+        public void OnPostXmlMinimize()
+        {
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+            string dataFile = System.IO.File.ReadAllText(file);
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(dataFile);
+            text1 = doc.OuterXml;
+        }
+        public void OnPostJsonMinimize()
+        {
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            string dataFile = System.IO.File.ReadAllText(file);
+            var obj = JsonConvert.DeserializeObject(dataFile);
+            text1 = JsonConvert.SerializeObject(obj);
+          
+        }
+        public void OnPostXmlIdent()
+        {
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+            string dataFile = System.IO.File.ReadAllText(file);
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(dataFile);
+            XDocument text = XDocument.Parse(doc.OuterXml);//automaticamente identa
+            text1 = text.ToString();
+            
+        }
+        public void OnPostJsonIdent()
+        {
 
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            string dataFile = System.IO.File.ReadAllText(file);
+            text1 = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(dataFile), Newtonsoft.Json.Formatting.Indented);
+
+        }
+        public void OnPostXmlToJson()
+        {
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+            string dataFile = System.IO.File.ReadAllText(file);
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(dataFile);
+            text1 = JsonConvert.SerializeXmlNode(doc, Newtonsoft.Json.Formatting.Indented);
+        }
+        public void OnPostJsonToXml()
+        {
+            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            string dataFile = System.IO.File.ReadAllText(file);
+            XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(dataFile);
+            doc.PreserveWhitespace = true;
+            //identação do XML
+            XDocument text = XDocument.Parse(doc.OuterXml);//automaticamente identa
+            text1 = text.ToString();
+        }
         public void OnPostJstreeToData (string jstreeData, string document)
         {
             text2 = "";
             text2+= textUpdate.ConvertJstree(environment, fileName,ref message, document, jstreeData);
             if (message != "")
             {
+                string file;
+                if(document=="xml")
+                     file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+                else
+                    file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+                string dataFile = System.IO.File.ReadAllText(file);
+                text1 = dataFile;
                 IsResponse = true;
                 IsSuccess = false;
             }
-            else
+            else {
                 text1 = text2;
+                SaveFile(text1);
+            }
         }
 
 
+        //criação save file
+        private void SaveFile(string text){
+            
+            if (text.StartsWith("<"))
+            {
+                var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+                System.IO.File.WriteAllText(file, text);
+            }
+            else
+            {
+                var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+                
+                System.IO.File.WriteAllText(file, text);
+                  
+            }
+        }
+
     }//Fim Classe IndexModel
-    /*
-         ************************************************
-         ************************************************
-         ******Início dos códigos dos nodos do site******
-         ************************************************
-         ************************************************
-    */
+    
 
 }
