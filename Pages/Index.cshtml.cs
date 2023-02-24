@@ -42,15 +42,17 @@ namespace XmlWebEditor.Pages
         public void OnGet()
         {
             text1 = textUpdate.NewJsonFile(environment, fileName);//limpar o Json
-            text1 = textUpdate.NewXmlFile(environment, fileName);//limpar o Xml
+            SaveFile(text1);//limpar o save file
         }
         public void OnPostXmlTextStart()
         {
             text1 = textUpdate.NewXmlFile(environment, fileName);
+            SaveFile(text1);
         }
         public void OnPostJsonTextStart()
         {
             text1 = textUpdate.NewJsonFile(environment, fileName);
+            SaveFile(text1);
         }
         /*
          * fução que controla a entrada e saída dos dois textos
@@ -168,7 +170,8 @@ namespace XmlWebEditor.Pages
             string dataFile = System.IO.File.ReadAllText(file);
             var obj = JsonConvert.DeserializeObject(dataFile);
             text1 = JsonConvert.SerializeObject(obj);
-          
+            SaveFile(text1);
+
         }
         public void OnPostXmlIdent()
         {
@@ -178,7 +181,7 @@ namespace XmlWebEditor.Pages
             doc.LoadXml(dataFile);
             XDocument text = XDocument.Parse(doc.OuterXml);//automaticamente identa
             text1 = text.ToString();
-            
+            SaveFile(text1);
         }
         public void OnPostJsonIdent()
         {
@@ -195,6 +198,7 @@ namespace XmlWebEditor.Pages
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(dataFile);
             text1 = JsonConvert.SerializeXmlNode(doc, Newtonsoft.Json.Formatting.Indented);
+            SaveFile(text1);
         }
         public void OnPostJsonToXml()
         {
@@ -205,6 +209,7 @@ namespace XmlWebEditor.Pages
             //identação do XML
             XDocument text = XDocument.Parse(doc.OuterXml);//automaticamente identa
             text1 = text.ToString();
+            SaveFile(text1);
         }
         public void OnPostJstreeToData (string jstreeData, string document)
         {

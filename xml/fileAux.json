@@ -1,7 +1,5 @@
 {
-  "root": [
-    [
-      "undefied"
-    ]
-  ]
+  "root": {
+    "branche": [ "undefied", "42" ]
+  }
 }
