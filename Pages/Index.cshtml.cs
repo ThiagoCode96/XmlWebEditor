@@ -1,34 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Text;
-using System;
-using XmlWebEditor.Controller;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using System.Net.Mime;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.StaticFiles;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Xml;
-using Microsoft.AspNetCore.Mvc.DataAnnotations;
-using System.Collections.Generic;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.Hosting.Server;
-using System.Reflection;
 using Newtonsoft.Json;
-using System.Text.Json.Nodes;
-using Newtonsoft.Json.Linq;
-
+using System.Net.Mime;
+using System.Net;
+using System;
+using System.Xml;
+using System.Xml.Linq;
+using XmlWebEditor.Controller;
+using System.Runtime.Intrinsics.X86;
+using System.Reflection.Metadata;
+using Microsoft.Extensions.WebEncoders.Testing;
+using System.IO;
 namespace XmlWebEditor.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment _environment)
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment _environment, IHostApplicationLifetime lifeTime)
         {
             _logger = logger;
             environment = _environment;
+            _lifeTime = lifeTime;
+            lifeTime.ApplicationStopping.Register(OnAppStop);
         }
-
+        private readonly IHostApplicationLifetime _lifeTime;
         private readonly IWebHostEnvironment environment;
         [BindProperty]
         public IFormFile Upload { get; set; }
@@ -38,20 +35,61 @@ namespace XmlWebEditor.Pages
         public bool IsResponse { get; set; }
         public string message = "";
         private string fileName = "auxArchive";
+        private string archiveName = "xml";
+        Guid cookieID = Guid.NewGuid();
+        private string archiveUserName = "/user/"; //Serve para demonstrar aonde está o local do usuário
+        
         TextMananger textUpdate = new TextMananger();
+        private void OnAppStop()
+        {
+            AppDelete();
+        }
+        public string MethodName(string Parameter)
+        {
+            return "teste";
+        }
+            public void AppDelete()
+        {
+            var filePath = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName);
+            if (Directory.Exists(filePath))
+            {
+                foreach (string file in Directory.GetFiles(filePath))
+                {
+                    System.IO.File.Delete(file);
+                }
+                System.IO.Directory.Delete(filePath);
+            }
+        }
+        private string setUserId()
+        {
+            string cookie = "";
+            cookie = Request.Cookies["userId"];
+            if (cookie == null) 
+            {
+                Response.Cookies.Append("UserId", cookieID.ToString());
+                return cookieID.ToString();
+            }
+            return cookie;
+        }
         public void OnGet()
         {
-            text1 = textUpdate.NewJsonFile(environment, fileName);//limpar o Json
+            string idCookie = setUserId();
+            archiveUserName +=idCookie;//tentei de todas as formas, porém a melhor forma é esta
+            text1 = textUpdate.NewJsonFile(environment, fileName, archiveName);//limpar o Json
             SaveFile(text1);//limpar o save file
         }
         public void OnPostXmlTextStart()
         {
-            text1 = textUpdate.NewXmlFile(environment, fileName);
+            string idCookie = setUserId();
+            archiveUserName += idCookie;//tentei de todas as formas, porém a melhor forma é esta
+            text1 = textUpdate.NewXmlFile(environment, fileName, archiveName);
             SaveFile(text1);
         }
         public void OnPostJsonTextStart()
         {
-            text1 = textUpdate.NewJsonFile(environment, fileName);
+            string idCookie = setUserId();
+            archiveUserName += idCookie;//tentei de todas as formas, porém a melhor forma é esta
+            text1 = textUpdate.NewJsonFile(environment, fileName, archiveName);
             SaveFile(text1);
         }
         /*
@@ -66,7 +104,7 @@ namespace XmlWebEditor.Pages
 
 
 
-            text2 += textUpdate.UpdateFile(environment, fileName, aux, ref message);
+            text2 += textUpdate.UpdateFile(environment, fileName , archiveName + archiveUserName, aux, ref message);
             if (message != "")
             {
                 IsResponse = true;
@@ -87,7 +125,7 @@ namespace XmlWebEditor.Pages
         {
             if (Upload == null)
                 return;
-            text1 = textUpdate.SetFile(Upload, environment, fileName, ref message);
+            text1 = textUpdate.SetFile(Upload, environment, fileName , (archiveName + archiveUserName), ref message);
             if (message != "")
             {
                 if (message.Contains("documento inválido"))
@@ -107,7 +145,7 @@ namespace XmlWebEditor.Pages
             string file;
             try
             {
-                file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+                file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
                 byte[] bytes = System.IO.File.ReadAllBytes(file);
                 string contentType;
                 new FileExtensionContentTypeProvider().TryGetContentType(file, out contentType);
@@ -135,7 +173,7 @@ namespace XmlWebEditor.Pages
             try
             {
 
-                file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+                file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
                 byte[] bytes = System.IO.File.ReadAllBytes(file);
                 string contentType;
                 new FileExtensionContentTypeProvider().TryGetContentType(file, out contentType);
@@ -158,15 +196,16 @@ namespace XmlWebEditor.Pages
         }//fim GetXmlFile
         public void OnPostXmlMinimize()
         {
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
             string dataFile = System.IO.File.ReadAllText(file);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(dataFile);
             text1 = doc.OuterXml;
+            SaveFile(text1);
         }
         public void OnPostJsonMinimize()
         {
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
             string dataFile = System.IO.File.ReadAllText(file);
             var obj = JsonConvert.DeserializeObject(dataFile);
             text1 = JsonConvert.SerializeObject(obj);
@@ -175,7 +214,7 @@ namespace XmlWebEditor.Pages
         }
         public void OnPostXmlIdent()
         {
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
             string dataFile = System.IO.File.ReadAllText(file);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(dataFile);
@@ -186,14 +225,14 @@ namespace XmlWebEditor.Pages
         public void OnPostJsonIdent()
         {
 
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
             string dataFile = System.IO.File.ReadAllText(file);
             text1 = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(dataFile), Newtonsoft.Json.Formatting.Indented);
 
         }
         public void OnPostXmlToJson()
         {
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
             string dataFile = System.IO.File.ReadAllText(file);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(dataFile);
@@ -202,7 +241,7 @@ namespace XmlWebEditor.Pages
         }
         public void OnPostJsonToXml()
         {
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
             string dataFile = System.IO.File.ReadAllText(file);
             XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(dataFile);
             doc.PreserveWhitespace = true;
@@ -211,47 +250,93 @@ namespace XmlWebEditor.Pages
             text1 = text.ToString();
             SaveFile(text1);
         }
-        public void OnPostJstreeToData (string jstreeData, string document)
+        public void OnPostJstreeToData(string jstreeData, string document)
         {
             text2 = "";
-            text2+= textUpdate.ConvertJstree(environment, fileName,ref message, document, jstreeData);
+            text2 += textUpdate.ConvertJstree( ref message, document, jstreeData);
             if (message != "")
             {
                 string file;
-                if(document=="xml")
-                     file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+                if (document == "xml")
+                    file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
                 else
-                    file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+                    file = Path.Combine(environment.ContentRootPath, archiveName+ archiveUserName, fileName + ".json");
                 string dataFile = System.IO.File.ReadAllText(file);
                 text1 = dataFile;
                 IsResponse = true;
                 IsSuccess = false;
             }
-            else {
+            else
+            {
                 text1 = text2;
                 SaveFile(text1);
             }
         }
+        public void OnPostFileFromStream(string link)
+        {
+            try
+            {
+                byte[] text = null;
+                using (var wc = new System.Net.WebClient())
+                    text = wc.DownloadData(link);
+                string finalText = System.Text.Encoding.Default.GetString(text);
+                text2 += textUpdate.UpdateFile(environment, fileName, (archiveName + archiveUserName), finalText, ref message);
+                if (message != "")
+                {
 
+                    text1 = textUpdate.NewXmlFile(environment, fileName, archiveName);
+                    IsResponse = true;
+                    IsSuccess = false;
+                }
+                else
+                {
+                    text1 = text2;
+                    SaveFile(text1);
+                }
+            }catch(Exception ex)
+            {
+                message = "URL ou arquivo inválido";
+                IsResponse = true;
+                IsSuccess = false;
+            }
+
+        }
 
         //criação save file
-        private void SaveFile(string text){
-            
+        private void SaveFile(string text)
+        {
+
             if (text.StartsWith("<"))
             {
-                var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+                var pathFile = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName);
+                var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
+                if (!Directory.Exists(pathFile))
+                {
+                    Directory.CreateDirectory(pathFile);
+                }
+                if (!System.IO.File.Exists(file))
+                {
+                    var myFile = System.IO.File.Create(file);
+                    myFile.Close();
+                }
                 System.IO.File.WriteAllText(file, text);
             }
             else
             {
-                var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
-                
+                var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
+                if (!Directory.Exists(file))
+                {
+                    var test=Directory.CreateDirectory(Path.Combine(environment.ContentRootPath, archiveName + archiveUserName));
+                    
+                }
+                var myFile = System.IO.File.Create(file);
+                myFile.Close();
                 System.IO.File.WriteAllText(file, text);
-                  
+
             }
         }
 
     }//Fim Classe IndexModel
-    
+
 
 }

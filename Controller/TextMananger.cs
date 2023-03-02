@@ -24,10 +24,10 @@ namespace XmlWebEditor.Controller
 {
     public class TextMananger
     {
-        public string VefiryXml(IFormFile Upload, IWebHostEnvironment environment, string fileName, ref string error)
+        public string VefiryXml(IFormFile Upload, IWebHostEnvironment environment, string fileName,string archiveName, ref string error)
         {
 
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
+            var file = Path.Combine(environment.ContentRootPath, archiveName, fileName + ".xml");
             string xml = "";
             try
             {
@@ -42,6 +42,8 @@ namespace XmlWebEditor.Controller
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(xml);
                 xml = XElement.Parse(xml).ToString();
+                var myFile = File.Create(file);
+                myFile.Close();
                 using (var fileStream = new FileStream(file, FileMode.Create))
                 {
                     byte[] information = new UTF8Encoding(true).GetBytes(xml);
@@ -64,10 +66,10 @@ namespace XmlWebEditor.Controller
             }
 
         }//end XmlVerification
-        public string VerifyJson(IFormFile Upload, IWebHostEnvironment environment, string fileName, ref string error)
+        public string VerifyJson(IFormFile Upload, IWebHostEnvironment environment, string fileName,string archiveName, ref string error)
         {
 
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
+            var file = Path.Combine(environment.ContentRootPath, archiveName, fileName + ".json");
             string json = "";
             try
             {
@@ -101,15 +103,15 @@ namespace XmlWebEditor.Controller
                 return json;
             }
         }//end VerifyJson
-        public string SetFile(IFormFile Upload, IWebHostEnvironment environment, string fileName, ref string error)
+        public string SetFile(IFormFile Upload, IWebHostEnvironment environment, string fileName,string archiveName, ref string error)
         {
             try
             {
                 string contentType = Upload.ContentType;
                 if (contentType == "text/xml" || contentType == "application/xml")
-                    return VefiryXml(Upload, environment, fileName, ref error);
+                    return VefiryXml(Upload, environment, fileName,archiveName, ref error);
                 else if (contentType == "text/json" || contentType == "application/json")
-                    return VerifyJson(Upload, environment, fileName, ref error);
+                    return VerifyJson(Upload, environment, fileName, archiveName, ref error);
                 else
                     throw new System.NullReferenceException();
             }
@@ -119,25 +121,25 @@ namespace XmlWebEditor.Controller
                 return "";
             }
         }//end SetXmlFile
-        public string NewXmlFile(IWebHostEnvironment environment, string fileName)
+        public string NewXmlFile(IWebHostEnvironment environment, string fileName,string archiveName)
         {
             string aux = "";
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName);
-            var newFile = Path.Combine(environment.ContentRootPath, "xml", "NewFile.xml");
+            var file = Path.Combine(environment.ContentRootPath, archiveName, fileName);
+            var newFile = Path.Combine(environment.ContentRootPath, archiveName, "NewFile.xml");
             File.Copy(newFile, file, true);
             aux = File.ReadAllText(newFile);
             return aux;
         }// end NewXmlFile
-        public string NewJsonFile(IWebHostEnvironment environment, string fileName)
+        public string NewJsonFile(IWebHostEnvironment environment, string fileName,string archiveName)
         {
             string aux = "";
-            var file = Path.Combine(environment.ContentRootPath, "xml", fileName);
-            var newFile = Path.Combine(environment.ContentRootPath, "xml", "NewFile.json");
+            var file = Path.Combine(environment.ContentRootPath, archiveName, fileName);
+            var newFile = Path.Combine(environment.ContentRootPath, archiveName, "NewFile.json");
             File.Copy(newFile, file, true);
             aux = File.ReadAllText(newFile);
             return aux;
         }// end NewXmlFile
-        public string UpdateFile(IWebHostEnvironment environment, string fileName, string xmlText, ref string error)
+        public string UpdateFile(IWebHostEnvironment environment, string fileName,string archiveName, string xmlText, ref string error)
         {
             try
             {
@@ -145,11 +147,11 @@ namespace XmlWebEditor.Controller
                 if (xmlText.StartsWith("<"))
                 {
 
-                    return UpdateXmlFile(environment, fileName, xmlText, ref error);
+                    return UpdateXmlFile(environment, fileName,archiveName, xmlText, ref error);
                 }
                 else if (xmlText.StartsWith("{") || xmlText.StartsWith("["))
                 {
-                    return UpdateJsonFile(environment, fileName, xmlText, ref error);
+                    return UpdateJsonFile(environment, fileName,  archiveName, xmlText, ref error);
                 }
                 else
                     throw new System.NullReferenceException();
@@ -161,7 +163,7 @@ namespace XmlWebEditor.Controller
             }
 
         }//end UpdateFile
-        public string UpdateXmlFile(IWebHostEnvironment environment, string fileName, string xmlText, ref string error)
+        public string UpdateXmlFile(IWebHostEnvironment environment, string fileName, string archiveName, string xmlText, ref string error)
         {
             string xml = xmlText;
             try
@@ -170,13 +172,15 @@ namespace XmlWebEditor.Controller
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(xml);
                 xml = XElement.Parse(xml).ToString();
-                var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".xml");
-                var fileAux = Path.Combine(environment.ContentRootPath, "xml", "fileAux.xml");
+                var file = Path.Combine(environment.ContentRootPath, archiveName, fileName + ".xml");
+                var fileAux = Path.Combine(environment.ContentRootPath, archiveName, "fileAux.xml");
                 File.WriteAllTextAsync(fileAux, xmlText);
                 /*Resumidamente: File.WriteallTextAsync necessita de tempo
                  * para atualizar e então o document.load poder ser utilizado, por isto:
                  * */
                 //Thread.Sleep(100);
+                var myFile = File.Create(file);
+                myFile.Close();
                 File.Copy(fileAux, file, true);
                 return xml;
 
@@ -194,7 +198,7 @@ namespace XmlWebEditor.Controller
                 return xml;
             }
         }//end UpdateXmlFile
-        public string UpdateJsonFile(IWebHostEnvironment environment, string fileName, string xmlText, ref string error)
+        public string UpdateJsonFile(IWebHostEnvironment environment, string fileName, string archiveName, string xmlText, ref string error)
         {
             string json = xmlText;
             dynamic jsonAux;
@@ -203,14 +207,17 @@ namespace XmlWebEditor.Controller
 
                 jsonAux = JsonConvert.DeserializeObject(json);
                 json = JsonConvert.SerializeObject(jsonAux, Newtonsoft.Json.Formatting.Indented);
-                var file = Path.Combine(environment.ContentRootPath, "xml", fileName + ".json");
-                var fileAux = Path.Combine(environment.ContentRootPath, "xml", "fileAux.json");
+                var file = Path.Combine(environment.ContentRootPath, archiveName, fileName + ".json");
+                var fileAux = Path.Combine(environment.ContentRootPath, archiveName, "fileAux.json");
                 File.WriteAllTextAsync(fileAux, xmlText);
                 /*Resumidamente: File.WriteallTextAsync necessita de tempo
                  * para atualizar e então o document.load poder ser utilizado, por isto:
                 */
                 //Thread.Sleep(100);
                 //obs: por enquanto aos testes não fora mais necessário, porém deixo aqui "em caso de" 
+               
+                var myFile=File.Create(file);
+                myFile.Close();
                 File.Copy(fileAux, file, true);
                 return json;
 
@@ -302,7 +309,7 @@ namespace XmlWebEditor.Controller
         
     
             
-        public string ConvertJstree(IWebHostEnvironment environment, string fileName, ref string error,string document,string jstree)
+        public string ConvertJstree( ref string error,string document,string jstree)
         {
             try
             {
@@ -319,7 +326,7 @@ namespace XmlWebEditor.Controller
                     XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(updatedJson);
                     doc.PreserveWhitespace = true;
                     //identação do XML
-                    XDocument text = XDocument.Parse(doc.OuterXml);//automaticamente ident
+                    XDocument text = XDocument.Parse(doc.OuterXml);//automaticamente identa
                     return text.ToString();
                 }
                 string finalJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(updatedJson), Newtonsoft.Json.Formatting.Indented);

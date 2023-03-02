@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="AjaxControlToolkit" Version="20.1.0" />
+    <PackageReference Include="CodeMirror" Version="2.37.0" />
     <PackageReference Include="jsTree" Version="3.1.1.2" />
     <PackageReference Include="Microsoft.AspNet.WebHelpers" Version="3.2.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />

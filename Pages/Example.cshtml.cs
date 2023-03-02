@@ -27,7 +27,9 @@ namespace XmlWebEditor.Pages
         public IFormFile Upload { get; set; }
         public string texto2 { get; set; }
 
-        public string fileName = "auxArchive";
+        private string fileName = "auxArchive";
+
+        private string archiveName = "xml";
 
         public TextMananger textMananger= new TextMananger();
 
@@ -43,7 +45,7 @@ namespace XmlWebEditor.Pages
         }
         public void OnGet()
         {
-            texto2 = textMananger.NewJsonFile(environment, fileName);
+            texto2 = textMananger.NewJsonFile(environment, fileName, archiveName);
 
         }
         [HttpGet]
