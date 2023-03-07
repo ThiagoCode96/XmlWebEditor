@@ -14,7 +14,28 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="xml\auxArchive.json" />
+    <Content Remove="xml\fileAux.json" />
+    <Content Remove="xml\user\auxArchive.json" />
+    <Content Remove="xml\user\cc95df9f-af0a-4da6-84b3-41dcffc79360.json" />
+    <Content Remove="xml\user\fileAux.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="xml\auxArchive" />
+    <None Remove="xml\auxArchive.xml" />
+    <None Remove="xml\auxText" />
+    <None Remove="xml\fileAux.xml" />
+    <None Remove="xml\user\auxArchive" />
+    <None Remove="xml\user\auxArchive.xml" />
+    <None Remove="xml\user\fileAux.xml" />
+    <None Remove="xml\user\xmlArchive.xml" />
+    <None Remove="xml\xmlArchive.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="xml\user\" />
   </ItemGroup>
 
   <ItemGroup>

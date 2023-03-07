@@ -12,45 +12,40 @@ using System.Runtime.Intrinsics.X86;
 using System.Reflection.Metadata;
 using Microsoft.Extensions.WebEncoders.Testing;
 using System.IO;
+using Microsoft.Extensions.Hosting;
+using System.Runtime.CompilerServices;
+
 namespace XmlWebEditor.Pages
 {
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-
-        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment _environment, IHostApplicationLifetime lifeTime)
+        private readonly IHostApplicationLifetime _lifeTime;
+        private readonly IWebHostEnvironment environment;
+        public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment _environment)
         {
             _logger = logger;
             environment = _environment;
-            _lifeTime = lifeTime;
-            lifeTime.ApplicationStopping.Register(OnAppStop);
         }
-        private readonly IHostApplicationLifetime _lifeTime;
-        private readonly IWebHostEnvironment environment;
+
+
         [BindProperty]
         public IFormFile Upload { get; set; }
         public string text2 { get; set; }
         public string text1 { get; set; }
         public bool IsSuccess { get; set; }
         public bool IsResponse { get; set; }
+
         public string message = "";
         private string fileName = "auxArchive";
         private string archiveName = "xml";
         Guid cookieID = Guid.NewGuid();
-        private string archiveUserName = "/user/"; //Serve para demonstrar aonde está o local do usuário
+        private string archiveUserName = "user"; //Serve para demonstrar aonde está o local do usuário
         
         TextMananger textUpdate = new TextMananger();
-        private void OnAppStop()
+        private void ArchiveDelete(string fileName)
         {
-            AppDelete();
-        }
-        public string MethodName(string Parameter)
-        {
-            return "teste";
-        }
-            public void AppDelete()
-        {
-            var filePath = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName);
+            var filePath = fileName;
             if (Directory.Exists(filePath))
             {
                 foreach (string file in Directory.GetFiles(filePath))
@@ -60,7 +55,7 @@ namespace XmlWebEditor.Pages
                 System.IO.Directory.Delete(filePath);
             }
         }
-        private string setUserId()
+        private string SetUserId()
         {
             string cookie = "";
             cookie = Request.Cookies["userId"];
@@ -71,24 +66,27 @@ namespace XmlWebEditor.Pages
             }
             return cookie;
         }
+        private string SetFilePath()//set file apenas falará QUAL FILE É. Se deseja pegar o json ou o xml terá que fazer file=setfile()+(".json" ou ".xml") 
+        {
+            string cookieName = SetUserId();
+            string file=Path.Combine(environment.ContentRootPath, archiveName,archiveUserName,cookieName);
+            file = Path.Combine(file, fileName);
+            return file;
+        }
         public void OnGet()
         {
-            string idCookie = setUserId();
-            archiveUserName +=idCookie;//tentei de todas as formas, porém a melhor forma é esta
+            
             text1 = textUpdate.NewJsonFile(environment, fileName, archiveName);//limpar o Json
             SaveFile(text1);//limpar o save file
         }
         public void OnPostXmlTextStart()
         {
-            string idCookie = setUserId();
-            archiveUserName += idCookie;//tentei de todas as formas, porém a melhor forma é esta
             text1 = textUpdate.NewXmlFile(environment, fileName, archiveName);
             SaveFile(text1);
         }
         public void OnPostJsonTextStart()
         {
-            string idCookie = setUserId();
-            archiveUserName += idCookie;//tentei de todas as formas, porém a melhor forma é esta
+            string idCookie = SetUserId();
             text1 = textUpdate.NewJsonFile(environment, fileName, archiveName);
             SaveFile(text1);
         }
@@ -97,14 +95,13 @@ namespace XmlWebEditor.Pages
          */
         public void OnPostTextController(string text)
         {
-
             string aux = text;
             text1 = text;//Xml que as pessoas editam
             text2 = "";//Xml que estará disponível para a pessoa pegar. 
 
 
 
-            text2 += textUpdate.UpdateFile(environment, fileName , archiveName + archiveUserName, aux, ref message);
+            text2 += textUpdate.UpdateFile(environment, SetFilePath(), aux, ref message);
             if (message != "")
             {
                 IsResponse = true;
@@ -125,7 +122,7 @@ namespace XmlWebEditor.Pages
         {
             if (Upload == null)
                 return;
-            text1 = textUpdate.SetFile(Upload, environment, fileName , (archiveName + archiveUserName), ref message);
+            text1 = textUpdate.SetFile(Upload, environment,SetFilePath(), ref message);
             if (message != "")
             {
                 if (message.Contains("documento inválido"))
@@ -142,10 +139,10 @@ namespace XmlWebEditor.Pages
         }
         public ActionResult OnGetJsonFile()
         {
-            string file;
+            string file=SetFilePath()+".json";
             try
             {
-                file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
+                
                 byte[] bytes = System.IO.File.ReadAllBytes(file);
                 string contentType;
                 new FileExtensionContentTypeProvider().TryGetContentType(file, out contentType);
@@ -169,11 +166,11 @@ namespace XmlWebEditor.Pages
         }// end GetJsonFile
         public ActionResult OnGetXmlFile()
         {
-            string file;
+            string file=SetFilePath()+".xml";
             try
             {
 
-                file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
+                
                 byte[] bytes = System.IO.File.ReadAllBytes(file);
                 string contentType;
                 new FileExtensionContentTypeProvider().TryGetContentType(file, out contentType);
@@ -196,7 +193,7 @@ namespace XmlWebEditor.Pages
         }//fim GetXmlFile
         public void OnPostXmlMinimize()
         {
-            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
+            var file =SetFilePath()+".xml";
             string dataFile = System.IO.File.ReadAllText(file);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(dataFile);
@@ -205,7 +202,7 @@ namespace XmlWebEditor.Pages
         }
         public void OnPostJsonMinimize()
         {
-            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
+            var file = SetFilePath() + ".json";
             string dataFile = System.IO.File.ReadAllText(file);
             var obj = JsonConvert.DeserializeObject(dataFile);
             text1 = JsonConvert.SerializeObject(obj);
@@ -214,7 +211,7 @@ namespace XmlWebEditor.Pages
         }
         public void OnPostXmlIdent()
         {
-            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
+            var file = SetFilePath() + ".xml";
             string dataFile = System.IO.File.ReadAllText(file);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(dataFile);
@@ -224,15 +221,14 @@ namespace XmlWebEditor.Pages
         }
         public void OnPostJsonIdent()
         {
-
-            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
+            var file = SetFilePath() + ".json";
             string dataFile = System.IO.File.ReadAllText(file);
             text1 = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(dataFile), Newtonsoft.Json.Formatting.Indented);
 
         }
         public void OnPostXmlToJson()
         {
-            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
+            var file = SetFilePath() + ".xml";
             string dataFile = System.IO.File.ReadAllText(file);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(dataFile);
@@ -241,7 +237,7 @@ namespace XmlWebEditor.Pages
         }
         public void OnPostJsonToXml()
         {
-            var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
+            var file = SetFilePath() + ".json";
             string dataFile = System.IO.File.ReadAllText(file);
             XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(dataFile);
             doc.PreserveWhitespace = true;
@@ -252,15 +248,15 @@ namespace XmlWebEditor.Pages
         }
         public void OnPostJstreeToData(string jstreeData, string document)
         {
+           string file= SetFilePath(); //tentei de todas as formas, porém a melhor forma é es
             text2 = "";
             text2 += textUpdate.ConvertJstree( ref message, document, jstreeData);
             if (message != "")
             {
-                string file;
                 if (document == "xml")
-                    file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
+                    file += ".xml";
                 else
-                    file = Path.Combine(environment.ContentRootPath, archiveName+ archiveUserName, fileName + ".json");
+                    file += ".json";
                 string dataFile = System.IO.File.ReadAllText(file);
                 text1 = dataFile;
                 IsResponse = true;
@@ -274,13 +270,14 @@ namespace XmlWebEditor.Pages
         }
         public void OnPostFileFromStream(string link)
         {
+            
             try
             {
                 byte[] text = null;
                 using (var wc = new System.Net.WebClient())
                     text = wc.DownloadData(link);
                 string finalText = System.Text.Encoding.Default.GetString(text);
-                text2 += textUpdate.UpdateFile(environment, fileName, (archiveName + archiveUserName), finalText, ref message);
+                text2 += textUpdate.UpdateFile(environment,SetFilePath(), finalText, ref message);
                 if (message != "")
                 {
 
@@ -300,16 +297,21 @@ namespace XmlWebEditor.Pages
                 IsSuccess = false;
             }
 
+           
+
         }
 
         //criação save file
         private void SaveFile(string text)
         {
-
+            string cookieName = SetUserId();
+            var pathFile = Path.Combine(environment.ContentRootPath, archiveName , archiveUserName,cookieName);
+            var file = SetFilePath();
+            
             if (text.StartsWith("<"))
             {
-                var pathFile = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName);
-                var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".xml");
+                file += ".xml";
+                
                 if (!Directory.Exists(pathFile))
                 {
                     Directory.CreateDirectory(pathFile);
@@ -319,24 +321,84 @@ namespace XmlWebEditor.Pages
                     var myFile = System.IO.File.Create(file);
                     myFile.Close();
                 }
-                System.IO.File.WriteAllText(file, text);
             }
             else
             {
-                var file = Path.Combine(environment.ContentRootPath, archiveName + archiveUserName, fileName + ".json");
-                if (!Directory.Exists(file))
+                file += ".json";
+                if (!Directory.Exists(pathFile))
                 {
-                    var test=Directory.CreateDirectory(Path.Combine(environment.ContentRootPath, archiveName + archiveUserName));
-                    
+                    Directory.CreateDirectory(pathFile);
                 }
-                var myFile = System.IO.File.Create(file);
-                myFile.Close();
-                System.IO.File.WriteAllText(file, text);
+                if (!System.IO.File.Exists(file))
+                {
+                    var myFile = System.IO.File.Create(file);
+                    myFile.Close();
+                }
+                
 
             }
+            //resumidamente, para não dar problemas com o atualizador
+            Thread.Sleep(100);
+            System.IO.File.WriteAllText(file, text);
+        }
+        //timed file
+        public void GetTimedFile()
+        {
+            string file=Path.Combine(environment.ContentRootPath, archiveName, archiveUserName);
+            DateTime modification;
+            DateTime today= DateTime.Now;
+            foreach (string files in Directory.GetDirectories(file))
+            {
+                modification = System.IO.File.GetLastWriteTime(files) + TimeSpan.FromMinutes(5);
+                if (modification < today)
+                   ArchiveDelete(files);
+            }
+                
         }
 
     }//Fim Classe IndexModel
 
+    ///////////////////////////////////////
+    ////////new timed host service/////////
+    ///////////////////////////////////////
+    public class TimedHostedService : IHostedService, IDisposable
+    {
+        private int executionCount = 0;
+        private readonly ILogger<TimedHostedService> logger;
+        private Timer? timer = null;
+        IndexModel index;
+        public TimedHostedService(ILogger<TimedHostedService> _logger, ILogger<IndexModel> _logger2, IWebHostEnvironment _environment)
+        {
+            logger = _logger;
+            index = new IndexModel(_logger2, _environment);
+        }
+       
 
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            logger.LogInformation("starting Timed clean");
+            timer = new Timer(DoWork, null, TimeSpan.Zero,
+            TimeSpan.FromMinutes(5));
+            return Task.CompletedTask;
+        }
+        ///parte para modificar
+        private async void DoWork(object? state)
+        {
+            logger.LogInformation("Timed Background Service is working.");
+            index.GetTimedFile();
+        }
+        /// fim da modificação
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            logger.LogInformation("Timed Background Service is stopping.");
+
+            timer?.Change(Timeout.Infinite, 0);
+
+            return Task.CompletedTask;
+        }
+        public void Dispose()
+        {
+            timer?.Dispose();
+        }
+    }
 }

@@ -24,6 +24,7 @@
             document = "json";
 
         }
+        ;
     }
     catch
     {
@@ -55,6 +56,7 @@
             </div>
         }
     }
+
     <div id="xml-button-top">
         <form asp-page-handler="xmlTextStart" method="post" enctype="multipart/form-data">
             <button class="btn btn-default"> novo XML </button>
@@ -94,7 +96,6 @@
             </form>
             
         }
-
     </div>
     <div id="xml-archives">
         @*set file*@
@@ -125,6 +126,7 @@
                 return true;
             }
         </script>
+        <p style="margin:auto;">Atenção: para inserção de 2 ou mais elementos num mesmo objeto (como "objeto":["1","2"]) por favor colocar os objetos numerados como no exemplo do novo JSON</p>
     </div>
     <div id="xml-textarea">
         <div >
@@ -137,14 +139,14 @@
                 @*fim demonstrando line number*@
                 <div class="editor">
                     <textarea id='lineCounter' wrap='off' readonly>1.</textarea>
-                    <textarea class="xml-text"  typeof="text" name="text" rows="15" cols="90" id="codeEditor">@Model.text1</textarea>
+                    <textarea class="xml-text"  typeof="text" name="text" cols="90" id="codeEditor">@Model.text1</textarea>
                 </div>
                 @*
                     criação de script para as linhas
                 *@
             </form>
         </div>
-        @* Json e o Style do class editor *@
+        @* Json do class editor *@
         <script>
             var codeEditor = document.getElementById('codeEditor');
             var lineCounter = document.getElementById('lineCounter');
@@ -179,6 +181,7 @@
             $(document).ready(line_counter());
         </script>
         @*fim do script para o form*@
+        @* início Style do class editor*@
         <style>
             #codeEditor, #lineCounter {
                 font-family: lucida console, courier new, courier, monospace;
@@ -218,7 +221,7 @@
 
             #codeEditor {
                 padding-left: calc(3.5rem + 5px);
-                width: 100%;
+                width: 99%;
                 /* Determine appearance of code editor */
                 background-color: #272822;
                 border-color: #272822;
@@ -230,7 +233,7 @@
             @*"*@
             <form asp-page-handler="jstreeToData" method="post">
                 <div>
-                    <p>nodes: Atenção: para inserção de 2 ou mais elementos num mesmo objeto (como "objeto":["1","2"]) por favor colocar os objetos numerados como no exemplo do novo JSON</p>
+                    <p>nodes: </p>
                     
                     <button class="btn btn-default" type="submit" onclick="return updateJson()" >atualizar</button>
                     @*
@@ -278,27 +281,32 @@
                             "themes": {
                                 "variant": "large", "stripes": true
                             },
-                            'check_callback': true,
+                            'check_callback':true,
                             data: jsonToJsTreeObject(treedoc)
                         },
                         "types": {
+                            "#": {
+                                "valid_children": ["root"]
+                            },
                             "root": {
+                                "icon": "/static/3.3.15/assets/images/tree_icon.png",
                                 "valid_children": ["default"]
                             },
-                            "default" : {
-                                "valid_children" : ["default","file"]
+                            "default": {
+                                "valid_children": ["default", "file"]
                             },
                             "file": {
-                                "icon": "glyphicon glyphicon-file",
+                                "icon": "./Img/JstreeFile.png",
                                 "valid_children": []
                             }
                         },
                         "plugins": [
                             "contextmenu", "dnd", "search",
-                            "state", "types", "wholerow"
+                            "state", "types", "wholerow"    
                         ]
                     
                     })
+
 
                 ///TESTE DE JAVASCRIPT
                 //var tree = $('#nodos').jstree().get_json( node, li_attr, a_attr );
@@ -325,15 +333,8 @@
 
                 return final_array;
             }
-
-        </script>
-        @* AVERIGUA SE A PESSOA SAIU DO SITE, SE ELA SAIU ELE FARÁ ALGO*@
-        <script>
-            window.addEventListener('beforeunload',function(e){
-                e.preventDefault();
-                e.returnValue = '';
-
-            })
+            //EXCHANGE THE PLUGIN:
+            
         </script>
     </div>
 </div>

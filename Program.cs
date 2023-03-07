@@ -1,7 +1,12 @@
+using XmlWebEditor.Pages;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+// Add background worker Service
+
+builder.Services.AddHostedService<XmlWebEditor.Pages.TimedHostedService>();
 
 var app = builder.Build();
 
