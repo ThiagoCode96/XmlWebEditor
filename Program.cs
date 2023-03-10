@@ -6,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 // Add background worker Service
 
-builder.Services.AddHostedService<XmlWebEditor.Pages.TimedHostedService>();
 
 var app = builder.Build();
 

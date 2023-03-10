@@ -69,33 +69,58 @@
         *@
         @if (document=="xml")
         {
+            <form asp-page-handler="xmlFile" method="post">
+                <button class="btn btn-default" type="submit" onclick="return savetext1()" >salvar </button>
+                <input type="hidden" name="text" class="xmlFile" runnat="server" />
+            </form>
+            
 
-            <a class="btn btn-default" asp-page-handler="xmlFile">salvar </a>
             <form asp-page-handler="xmlMinimize" method="post">
-                <button class="btn btn-default" type="submit">minimizar</button>
+                <button class="btn btn-default" type="submit" onclick="return savetext1()">minimizar</button>
+                <input type="hidden" name="text" class="xmlFile" runnat="server" />
             </form>
             <form asp-page-handler="xmlIdent" method="post">
-                <button class="btn btn-default" type="submit">identar</button>
+                <button class="btn btn-default" type="submit" onclick="return savetext1()">identar</button>
+                <input type="hidden" name="text" class="xmlFile" runnat="server" />
             </form>
             <form asp-page-handler="xmlToJson" method="post">
-                <button class="btn btn-default" type="submit">transformar em Json</button>
-            </form>
-
-        }
-        else if (document=="json")
-        {
-            <a class="btn btn-default" asp-page-handler="jsonFile"> salvar </a>
-            <form asp-page-handler="jsonMinimize" method="post">
-                <button class="btn btn-default" type="submit" >minimizar</button>
-            </form>
-            <form asp-page-handler="jsonIdent" method="post">
-                <button class="btn btn-default" type="submit">identar</button>
-            </form>
-            <form asp-page-handler="jsonToXml" method="post">
-                <button class="btn btn-default" type="submit">transformar em Xml</button>
+                <button class="btn btn-default" type="submit" onclick="return savetext1()">transformar em Json</button>
+                <input type="hidden" name="text" class="xmlFile" runnat="server" />
             </form>
             
         }
+        else if (document=="json")
+        {
+            <form asp-page-handler="jsonFile" method="post">
+                <button class="btn btn-default" type="submit" onclick="return savetext1()">salvar </button>
+                <input type="hidden" name="text" class="xmlFile" runnat="server" />
+            </form>
+            <form asp-page-handler="jsonMinimize" method="post">
+                <button class="btn btn-default" type="submit" onclick="return savetext1()">minimizar</button>
+                <input type="hidden" name="text" class="xmlFile" runnat="server" />
+            </form>
+            <form asp-page-handler="jsonIdent" method="post">
+                <button class="btn btn-default" type="submit" onclick="return savetext1()">identar</button>
+                <input type="hidden" name="text" class="xmlFile" runnat="server" />
+            </form>
+            <form asp-page-handler="jsonToXml" method="post">
+                <button class="btn btn-default" type="submit" onclick="return savetext1()">transformar em Xml</button>
+                <input type="hidden" name="text"  class="xmlFile" runnat="server" />
+            </form>
+            
+        }
+        @*script para salvar o text1*@
+        <script>
+            function savetext1() {
+                var texto = document.getElementsByClassName("xmlFile");
+                var y=texto.length; 
+                for(let i=0; i < y;i++){
+                    texto[i].value = document.getElementById("codeEditor").value
+                }
+                
+                //document.getElementsByClassName("xmlFile").value =texto;
+            }
+        </script>
     </div>
     <div id="xml-archives">
         @*set file*@
@@ -235,7 +260,7 @@
                 <div>
                     <p>nodes: </p>
                     
-                    <button class="btn btn-default" type="submit" onclick="return updateJson()" >atualizar</button>
+                    <button type="submit" onclick="return updateJson()" >atualizar</button>
                     @*
                     script para o usuário ver o arquivo json
                     *@
@@ -261,6 +286,13 @@
        </div>
     </div>
     <div id="jsTree">
+        @*LIMPEZA DOS ÍCONES*@
+        <style type="text/css">
+            .jstree li > a > .jstree-icon {
+                display: none !important;
+            }
+        </style>
+        @*FIM LIMPEZA DOS ÍCONES*@
         <script>
             $(document).ready(function () 
             {
@@ -272,7 +304,7 @@
                     treedoc= JSON.parse(@Html.Raw(Json.Serialize(JsonConvert.SerializeXmlNode(docx))))
                 
 
-                $('#nodos').jstree // @*segura isto: @Html.Raw(Model.getFile().Replace(@"\", "/"))"*@
+                $('#nodos').jstree 
                     ({
                    
                         "core": {
@@ -284,33 +316,15 @@
                             'check_callback':true,
                             data: jsonToJsTreeObject(treedoc)
                         },
-                        "types": {
-                            "#": {
-                                "valid_children": ["root"]
-                            },
-                            "root": {
-                                "icon": "/static/3.3.15/assets/images/tree_icon.png",
-                                "valid_children": ["default"]
-                            },
-                            "default": {
-                                "valid_children": ["default", "file"]
-                            },
-                            "file": {
-                                "icon": "./Img/JstreeFile.png",
-                                "valid_children": []
-                            }
-                        },
+                       
                         "plugins": [
                             "contextmenu", "dnd", "search",
-                            "state", "types", "wholerow"    
+                            "state",  "wholerow"    
                         ]
                     
                     })
 
 
-                ///TESTE DE JAVASCRIPT
-                //var tree = $('#nodos').jstree().get_json( node, li_attr, a_attr );
-                ///FIM TESTE DE JAVASCRIPT
             }
             );
             //JSTREE PARA JS
