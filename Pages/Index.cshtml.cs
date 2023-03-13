@@ -40,15 +40,7 @@ namespace XmlWebEditor.Pages
         public string message = "";
         private string fileName = "auxArchive";
         private string archiveName = "xml";
-        private string archiveUserName = "user"; //Serve para demonstrar aonde está o local do usuário
-
         TextMananger textUpdate = new TextMananger();
-        private string SetFilePath()//set file apenas falará QUAL FILE É. Se deseja pegar o json ou o xml terá que fazer file=setfile()+(".json" ou ".xml") 
-        {
-            string file = Path.Combine(environment.ContentRootPath, archiveName, archiveUserName);
-            file = Path.Combine(file, fileName);
-            return file;
-        }
         public void OnGet()
         {
 
@@ -76,7 +68,7 @@ namespace XmlWebEditor.Pages
 
 
 
-            text2 += textUpdate.UpdateFile(environment, SetFilePath(), aux, ref message);
+            text2 += textUpdate.UpdateFile( aux, ref message);
             if (message != "")
             {
                 IsResponse = true;
@@ -96,7 +88,7 @@ namespace XmlWebEditor.Pages
         {
             if (Upload == null)
                 return;
-            text1 = textUpdate.SetFile(Upload, environment, SetFilePath(), ref message);
+            text1 = textUpdate.SetFile(Upload, ref message);
             if (message != "")
             {
                 if (message.Contains("documento inválido"))
@@ -203,25 +195,36 @@ namespace XmlWebEditor.Pages
         {
 
             string dataFile = text;
-            XmlDocument doc = (XmlDocument)JsonConvert.DeserializeXmlNode(dataFile);
-            doc.PreserveWhitespace = true;
-            //identação do XML
-            XDocument textXml = XDocument.Parse(doc.OuterXml);//automaticamente identa
-            text1 = textXml.ToString();
+            try
+            {
+                XmlDocument doc = JsonConvert.DeserializeXmlNode(dataFile);
+                doc.PreserveWhitespace = true;
+                //identação do XML
+                XDocument textXml = XDocument.Parse(doc.OuterXml);//automaticamente identa
+                text1 = textXml.ToString();
+            }
+            catch(Exception e)
+            {
+                text1 =text;
+                IsResponse = true;
+                IsSuccess = false;
+                if(e.Message.Contains("JSON root object has multiple properties."))
+                {
+                    message = "infelizmente o Json não tem um root expecífico. Por favor, crie um root principal";
+                }
+                else
+                {
+                    message = e.Message;
+                }
+            }
         }
-        public void OnPostJstreeToData(string jstreeData, string document)
+        public void OnPostJstreeToData(string jstreeData, string document, string text)
         {
-            string file = SetFilePath(); //tentei de todas as formas, porém a melhor forma é es
             text2 = "";
             text2 += textUpdate.ConvertJstree(ref message, document, jstreeData);
             if (message != "")
             {
-                if (document == "xml")
-                    file += ".xml";
-                else
-                    file += ".json";
-                string dataFile = System.IO.File.ReadAllText(file);
-                text1 = dataFile;
+                text1 = text;
                 IsResponse = true;
                 IsSuccess = false;
             }
@@ -239,7 +242,7 @@ namespace XmlWebEditor.Pages
                 using (var wc = new System.Net.WebClient())
                     text = wc.DownloadData(link);
                 string finalText = System.Text.Encoding.Default.GetString(text);
-                text2 += textUpdate.UpdateFile(environment, SetFilePath(), finalText, ref message);
+                text2 += textUpdate.UpdateFile( finalText, ref message);
                 if (message != "")
                 {
 

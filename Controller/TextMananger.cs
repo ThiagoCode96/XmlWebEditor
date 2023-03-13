@@ -24,7 +24,7 @@ namespace XmlWebEditor.Controller
 {
     public class TextMananger
     {
-        public string VefiryXml(IFormFile Upload, IWebHostEnvironment environment, string file, ref string error)
+        public string VefiryXml(IFormFile Upload, ref string error)
         {
 
             
@@ -42,17 +42,7 @@ namespace XmlWebEditor.Controller
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(xml);
                 xml = XElement.Parse(xml).ToString();
-                if (!File.Exists(file))
-                {
-                    var myFile = File.Create(file);
-                    myFile.Close();
-                }
-                using (var fileStream = new FileStream(file, FileMode.Create))
-                {
-                    byte[] information = new UTF8Encoding(true).GetBytes(xml);
-                    fileStream.Write(information, 0, information.Length);
-                    fileStream.Dispose();
-                }
+                
                 return xml;
 
             }
@@ -69,7 +59,7 @@ namespace XmlWebEditor.Controller
             }
 
         }//end XmlVerification
-        public string VerifyJson(IFormFile Upload, IWebHostEnvironment environment, string file, ref string error)
+        public string VerifyJson(IFormFile Upload, ref string error)
         {
             string json = "";
             try
@@ -84,12 +74,6 @@ namespace XmlWebEditor.Controller
                 }
                 dynamic jsonAux = JsonConvert.DeserializeObject(json);
 
-                using (var fileStream = new FileStream(file, FileMode.Create))
-                {
-                    byte[] information = new UTF8Encoding(true).GetBytes(JsonConvert.SerializeObject(jsonAux, Newtonsoft.Json.Formatting.Indented));
-                    fileStream.Write(information, 0, information.Length);
-                    fileStream.Dispose();
-                }
                 return JsonConvert.SerializeObject(jsonAux, Newtonsoft.Json.Formatting.Indented);
 
             }
@@ -104,15 +88,15 @@ namespace XmlWebEditor.Controller
                 return json;
             }
         }//end VerifyJson
-        public string SetFile(IFormFile Upload, IWebHostEnvironment environment, string file, ref string error)
+        public string SetFile(IFormFile Upload, ref string error)
         {
             try
             {
                 string contentType = Upload.ContentType;
                 if (contentType == "text/xml" || contentType == "application/xml")
-                    return VefiryXml(Upload, environment, file + ".xml", ref error);
+                    return VefiryXml(Upload, ref error);
                 else if (contentType == "text/json" || contentType == "application/json")
-                    return VerifyJson(Upload, environment,file + ".json", ref error);
+                    return VerifyJson(Upload, ref error);
                 else
                     throw new System.NullReferenceException();
             }
@@ -140,7 +124,7 @@ namespace XmlWebEditor.Controller
             aux = File.ReadAllText(newFile);
             return aux;
         }// end NewXmlFile
-        public string UpdateFile(IWebHostEnvironment environment, string file, string xmlText, ref string error)
+        public string UpdateFile( string xmlText, ref string error)
         {
             try
             {
@@ -148,11 +132,11 @@ namespace XmlWebEditor.Controller
                 if (xmlText.StartsWith("<"))
                 {
 
-                    return UpdateXmlFile(environment, file+".xml", xmlText, ref error);
+                    return UpdateXmlFile( xmlText, ref error);
                 }
                 else if (xmlText.StartsWith("{") || xmlText.StartsWith("["))
                 {
-                    return UpdateJsonFile(environment, file+".json", xmlText, ref error);
+                    return UpdateJsonFile(xmlText, ref error);
                 }
                 else
                     throw new System.NullReferenceException();
@@ -164,20 +148,12 @@ namespace XmlWebEditor.Controller
             }
 
         }//end UpdateFile
-        public string UpdateXmlFile(IWebHostEnvironment environment, string file, string xmlText, ref string error)
+        public string UpdateXmlFile( string xmlText, ref string error)
         {
             string xml = xmlText;
             try
             {
-
-                XmlDocument document = new XmlDocument();
-                document.LoadXml(xml);
                 xml = XElement.Parse(xml).ToString();
-                File.WriteAllTextAsync(file, xmlText);
-                /*Resumidamente: File.WriteallTextAsync necessita de tempo
-                 * para atualizar e então o document.load poder ser utilizado, por isto:
-                 * */
-                //Thread.Sleep(100);
                 return xml;
 
             }
@@ -194,22 +170,15 @@ namespace XmlWebEditor.Controller
                 return xml;
             }
         }//end UpdateXmlFile
-        public string UpdateJsonFile(IWebHostEnvironment environment, string file, string xmlText, ref string error)
+        public string UpdateJsonFile(string JSONText, ref string error)
         {
-            string json = xmlText;
+            string json = JSONText;
             dynamic jsonAux;
             try
             {
 
                 jsonAux = JsonConvert.DeserializeObject(json);
                 json = JsonConvert.SerializeObject(jsonAux, Newtonsoft.Json.Formatting.Indented);
-                File.WriteAllTextAsync(file, xmlText);
-                /*Resumidamente: File.WriteallTextAsync necessita de tempo
-                 * para atualizar e então o document.load poder ser utilizado, por isto:
-                */
-                //Thread.Sleep(100);
-                //obs: por enquanto aos testes não fora mais necessário, porém deixo aqui "em caso de" 
-               
                 return json;
 
             }

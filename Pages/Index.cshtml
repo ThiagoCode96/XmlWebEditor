@@ -269,12 +269,17 @@
                             var tree = $('#nodos').jstree(true).get_json('#', { flat: false });
                             // Convert the result to a JSON string
                             document.getElementById("jstreeData").value=JSON.stringify(tree);
+                            savetext1();
                             
                         }
                     </script>
                     <input id="jstreeData" name="jstreeData" type="hidden"  runat="server" />
+                    <input type="hidden" name="text" class="xmlFile" runnat="server" />
                     @if(document=="xml"){
                         <input type="hidden" name="document" value="xml" runat="server" />
+                    }
+                    else{
+                        <input type="hidden" name="document" value="json" runat="server" />
                     }
                 </div>
                 @*
